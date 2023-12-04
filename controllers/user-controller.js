@@ -40,7 +40,8 @@ exports.getAllUser = async (req, res) => {
 
 // 유저 조회 (아이디로 조회)
 exports.getUser = async (req, res) => {
-  const { user_id } = req.body;
+  const { user_id } = req.params;
+
   try {
     const result = await userDB.getUser(user_id);
     res.status(200).json(result);
