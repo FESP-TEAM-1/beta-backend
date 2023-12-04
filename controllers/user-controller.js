@@ -1,4 +1,4 @@
-const bcrypt = require("bcrypt"); // npm install bcrypt
+const bcrypt = require("bcrypt");
 const userDB = require("../models/user-db");
 const jwt = require("jsonwebtoken");
 const { v4: uuid } = require("uuid");
@@ -29,9 +29,9 @@ const hashCompare = async (inputValue, hash) => {
 };
 
 // 전체 유저 조회
-exports.getAllUser = async (req, res) => {
+exports.getAllMember = async (req, res) => {
   try {
-    const result = await userDB.getAllUser();
+    const result = await userDB.getAllMember();
     res.status(200).json(result);
   } catch (err) {
     res.status(500).json({ messge: err });
@@ -39,11 +39,31 @@ exports.getAllUser = async (req, res) => {
 };
 
 // 유저 조회 (아이디로 조회)
-exports.getUser = async (req, res) => {
+exports.getMember = async (req, res) => {
   const { user_id } = req.params;
 
   try {
-    const result = await userDB.getUser(user_id);
+    const result = await userDB.getMember(user_id);
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({ messge: err });
+  }
+};
+
+// 일반 유저 조회
+exports.getUser = async (req, res) => {
+  try {
+    const result = await userDB.getUser();
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({ messge: err });
+  }
+};
+
+// 관리자 조회
+exports.getAdmin = async (req, res) => {
+  try {
+    const result = await userDB.getAdmin();
     res.status(200).json(result);
   } catch (err) {
     res.status(500).json({ messge: err });
@@ -54,7 +74,7 @@ exports.getUser = async (req, res) => {
 exports.login = async (req, res) => {
   const { user_id, user_pw } = req.body;
   try {
-    const user = await userDB.getUser(user_id);
+    const user = await userDB.getMember(user_id);
 
     // 아이디가 존재하지 않을 때
     if (user.length === 0) {
@@ -119,10 +139,8 @@ exports.signup = async (req, res) => {
   } = req.body;
 
   try {
-    console.log(req.body);
-
     // 아이디 중복 체크
-    const getUser = await userDB.getUser(user_id);
+    const getUser = await userDB.getMember(user_id);
     if (getUser.length !== 0) {
       res.status(401).json({ message: "이미 존재하는 아이디입니다." });
       return;
