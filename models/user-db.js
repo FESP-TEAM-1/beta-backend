@@ -9,21 +9,19 @@ const rollback = util.promisify(db.rollback).bind(db); // 트랜잭션 롤백 (�
 // 전체 유저 조회
 exports.getAllMember = async () => {
   try {
-    const result = await query(
-      `SELECT idx, unique_id, name, user_email, user_id, birth_date, gender, phone_number, user_type, created_at FROM user`
-    );
+    const result = await query(`SELECT idx, unique_id, name, user_email, user_id, birth_date, gender, phone_number, user_type, created_at FROM user`);
     return result;
   } catch (err) {
     throw err;
   }
 };
 
-// 유저 조회 (아이디로 조회)
-exports.getMember = async (user_id) => {
+// 유저 조회 (아이디, 타입으로 조회)
+exports.getMember = async (user_id, user_role) => {
   try {
     const result = await query(
-      `SELECT idx, unique_id, name, user_email, user_id, birth_date, gender, phone_number, user_type, created_at FROM user WHERE user_id = ?`,
-      user_id
+      `SELECT idx, unique_id, name, user_email, user_id, user_pw, birth_date, gender, phone_number, user_role, created_at FROM user WHERE user_id = ? and user_role = ?`,
+      [user_id, user_role]
     );
     return result;
   } catch (err) {
@@ -57,32 +55,12 @@ exports.getAdmin = async () => {
 
 // 회원가입
 exports.signUp = async (data) => {
-  const [
-    unique_id,
-    name,
-    user_email,
-    user_id,
-    hash,
-    birth_date,
-    gender,
-    phone_number,
-    user_type,
-  ] = data;
+  const [unique_id, name, user_email, user_id, hash, birth_date, gender, phone_number, user_role] = data;
   const user_pw = hash;
   try {
     const result = await query(
-      `INSERT INTO user (unique_id, name, user_email, user_id, user_pw, birth_date, gender, phone_number, user_type) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        unique_id,
-        name,
-        user_email,
-        user_id,
-        user_pw,
-        birth_date,
-        gender,
-        phone_number,
-        user_type,
-      ]
+      `INSERT INTO user (unique_id, name, user_email, user_id, user_pw, birth_date, gender, phone_number, user_role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [unique_id, name, user_email, user_id, user_pw, birth_date, gender, phone_number, user_role]
     );
     return result;
   } catch (err) {

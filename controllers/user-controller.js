@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 const userDB = require("../models/user-db");
-const jwt = require("jsonwebtoken");
 const { v4: uuid } = require("uuid");
+const jwt = require("../utils/jwt-util");
 
 // PW to Hash
 const pwToHash = async (pw) => {
@@ -32,9 +32,15 @@ const hashCompare = async (inputValue, hash) => {
 exports.getAllMember = async (req, res) => {
   try {
     const result = await userDB.getAllMember();
-    res.status(200).json(result);
+    res.status(200).json({
+      ok: true,
+      data: result,
+    });
   } catch (err) {
-    res.status(500).json({ messge: err });
+    res.status(500).json({
+      ok: false,
+      messge: err,
+    });
   }
 };
 
@@ -44,9 +50,15 @@ exports.getMember = async (req, res) => {
 
   try {
     const result = await userDB.getMember(user_id);
-    res.status(200).json(result);
+    res.status(200).json({
+      ok: true,
+      data: result,
+    });
   } catch (err) {
-    res.status(500).json({ messge: err });
+    res.status(500).json({
+      ok: false,
+      messge: err,
+    });
   }
 };
 
@@ -54,9 +66,15 @@ exports.getMember = async (req, res) => {
 exports.getUser = async (req, res) => {
   try {
     const result = await userDB.getUser();
-    res.status(200).json(result);
+    res.status(200).json({
+      ok: true,
+      data: result,
+    });
   } catch (err) {
-    res.status(500).json({ messge: err });
+    res.status(500).json({
+      ok: false,
+      messge: err,
+    });
   }
 };
 
@@ -64,21 +82,30 @@ exports.getUser = async (req, res) => {
 exports.getAdmin = async (req, res) => {
   try {
     const result = await userDB.getAdmin();
-    res.status(200).json(result);
+    res.status(200).json({
+      ok: true,
+      data: result,
+    });
   } catch (err) {
-    res.status(500).json({ messge: err });
+    res.status(500).json({
+      ok: false,
+      messge: err,
+    });
   }
 };
 
 // 로그인 (JWT 생성)
 exports.login = async (req, res) => {
-  const { user_id, user_pw } = req.body;
+  const { user_id, user_pw, user_role } = req.body;
   try {
-    const user = await userDB.getMember(user_id);
+    const user = await userDB.getMember(user_id, user_role);
 
     // 아이디가 존재하지 않을 때
     if (user.length === 0) {
-      res.status(401).json({ message: "존재하지 않는 아이디입니다." });
+      res.status(401).json({
+        ok: false,
+        message: "존재하지 않는 아이디입니다.",
+      });
     }
 
     const blobToStr = Buffer.from(user[0].user_pw).toString("utf-8");
@@ -86,23 +113,32 @@ exports.login = async (req, res) => {
 
     // 비밀번호가 일치하지 않을 때
     if (!isMatch) {
-      res.status(401).json({ message: "비밀번호가 일치하지 않습니다." });
+      res.status(401).json({
+        ok: false,
+        message: "비밀번호가 일치하지 않습니다.",
+      });
       return;
     }
 
-    // JWT 생성
-    const token = jwt.sign(
-      {
-        user_id: user[0].user_id,
-        name: user[0].name,
-        user_type: user[0].user_type,
-      },
-      process.env.JWT_SECRET_KEY,
-      { expiresIn: "1h" } // 1시간 유효
-    );
+    const userInfo = {
+      user_id: user[0].user_id,
+      name: user[0].name,
+      user_type: user[0].user_type,
+    };
+
+    // JWT access Token 생성
+    const accessToken = jwt.generateAccessToken(userInfo);
+
+    // JWT refresh Token 생성
+    const refreshToken = jwt.generateRefreshToken();
 
     // JWT 쿠키에 저장
-    res.cookie("token", token, {
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      sameSite: "None",
+      secure: true,
+    });
+    res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       sameSite: "None",
       secure: true,
@@ -119,30 +155,77 @@ exports.login = async (req, res) => {
   }
 };
 
+// access Token 검증
+exports.verifyToken = async (req, res) => {
+  const accessToken = req.cookies.accessToken; // 쿠키에서 엑세스토큰 획득
+  const refreshToken = req.cookies.refreshToken; // 쿠키에서 리프레시토큰 획득
+
+  // 엑세스토큰이 없을 때
+  if (!accessToken) {
+    res.status(401).json({
+      ok: false,
+      message: "로그인 해주시기 바랍니다.",
+    });
+    return;
+  }
+  if (!refreshToken) {
+    res.status(401).json({
+      ok: false,
+      message: "로그인 해주시기 바랍니다.",
+    });
+    return;
+  }
+
+  // // 엑세스토큰 검증
+  // const isAccessTokenValid = jwt.verifyAccessToken(accessToken);
+  // if (!isAccessTokenValid) {
+  //   // 리프레시토큰 검증
+  //   const isRefreshTokenValid = jwt.verifyRefreshToken(refreshToken);
+  //   if (!isRefreshTokenValid) {
+  //     res.status(401).json({
+  //       ok: false,
+  //       message: "로그인 해주시기 바랍니다.",
+  //     });
+  //     return;
+  //   }
+
+  //   // 리프레시토큰 검증 성공
+  //   const payload = jwt.getAccessTokenPayload(accessToken);
+  //   const userInfo = {
+  //     user_id: payload.user_id,
+  //     name: payload.name,
+  //     user_type: payload.user_type,
+  //   };
+  //   const newAccessToken = jwt.generateAccessToken(userInfo);
+  //   res.cookie("accessToken", newAccessToken, {
+  //     httpOnly: true,
+  //     sameSite: "None",
+  //     secure: true,
+  //   });
+  // }
+};
+
 // 로그아웃
 exports.logout = async (req, res) => {
   res.clearCookie("token");
-  res.status(200).json({ message: "Logout successful" });
+  res.status(200).json({
+    ok: true,
+    message: "Logout successful",
+  });
 };
 
 // 회원가입
 exports.signup = async (req, res) => {
-  const {
-    name,
-    user_email,
-    user_id,
-    user_pw,
-    birth_date,
-    gender,
-    phone_number,
-    user_type,
-  } = req.body;
+  const { name, user_email, user_id, user_pw, birth_date, gender, phone_number, user_role } = req.body;
 
   try {
     // 아이디 중복 체크
     const getUser = await userDB.getMember(user_id);
     if (getUser.length !== 0) {
-      res.status(401).json({ message: "이미 존재하는 아이디입니다." });
+      res.status(401).json({
+        ok: false,
+        message: "이미 존재하는 아이디입니다.",
+      });
       return;
     }
 
@@ -151,21 +234,17 @@ exports.signup = async (req, res) => {
 
     // 회원가입
     const unique_id = uuid();
-    await userDB.signUp([
-      unique_id,
-      name,
-      user_email,
-      user_id,
-      hash,
-      birth_date,
-      gender,
-      phone_number,
-      user_type,
-    ]);
+    await userDB.signUp([unique_id, name, user_email, user_id, hash, birth_date, gender, phone_number, user_role]);
 
-    res.status(200).json({ message: "회원가입 성공!!!" });
+    res.status(200).json({
+      ok: true,
+      message: "회원가입 성공!!!",
+    });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "회원가입 실패..." });
+    res.status(500).json({
+      ok: false,
+      message: "회원가입 실패...",
+    });
   }
 };
