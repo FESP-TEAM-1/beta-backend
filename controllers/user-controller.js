@@ -72,9 +72,9 @@ exports.getAdmin = async (req, res) => {
 
 // 로그인 (JWT 생성)
 exports.login = async (req, res) => {
-  const { user_id, user_pw } = req.body;
+  const { user_id, user_pw, user_role } = req.body;
   try {
-    const user = await userDB.getMember(user_id);
+    const user = await userDB.getMember(user_id, user_role);
 
     // 아이디가 존재하지 않을 때
     if (user.length === 0) {
@@ -127,16 +127,7 @@ exports.logout = async (req, res) => {
 
 // 회원가입
 exports.signup = async (req, res) => {
-  const {
-    name,
-    user_email,
-    user_id,
-    user_pw,
-    birth_date,
-    gender,
-    phone_number,
-    user_type,
-  } = req.body;
+  const { name, user_email, user_id, user_pw, birth_date, gender, phone_number, user_role } = req.body;
 
   try {
     // 아이디 중복 체크
@@ -151,17 +142,7 @@ exports.signup = async (req, res) => {
 
     // 회원가입
     const unique_id = uuid();
-    await userDB.signUp([
-      unique_id,
-      name,
-      user_email,
-      user_id,
-      hash,
-      birth_date,
-      gender,
-      phone_number,
-      user_type,
-    ]);
+    await userDB.signUp([unique_id, name, user_email, user_id, hash, birth_date, gender, phone_number, user_role]);
 
     res.status(200).json({ message: "회원가입 성공!!!" });
   } catch (err) {
