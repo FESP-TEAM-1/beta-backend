@@ -9,7 +9,7 @@ const rollback = util.promisify(db.rollback).bind(db); // 트랜잭션 롤백 (�
 // 전체 배너 이미지 조회
 exports.getBannerImgs = async () => {
   try {
-    const result = await query(`SELECT id, show_id, image_url FROM main_image`);
+    const result = await query(`SELECT * FROM main_image order by updated_at desc limit 5`);
     return result;
   } catch (err) {
     throw err;
@@ -17,9 +17,9 @@ exports.getBannerImgs = async () => {
 };
 
 // show_id에 따른 이미지 조회
-exports.getShowImgs = async (show_id) => {
+exports.getShowImg = async (show_id) => {
   try {
-    const result = await query(`SELECT id, show_id, main_image_url, sub_images_url FROM showing WHERE id = ?`, [show_id]);
+    const result = await query(`SELECT id, main_image_url, sub_images_url FROM showing WHERE id = ?`, [show_id]);
     return result;
   } catch (err) {
     throw err;
@@ -27,9 +27,9 @@ exports.getShowImgs = async (show_id) => {
 };
 
 // story_id에 따른 이미지 조회
-exports.getStoryImgs = async (story_id) => {
+exports.getStoryImg = async (story_id) => {
   try {
-    const result = await query(`SELECT id, story_id, main_image_url, sub_images_url FROM story WHERE id = ?`, [story_id]);
+    const result = await query(`SELECT id, story_image_url FROM story WHERE id = ?`, [story_id]);
     return result;
   } catch (err) {
     throw err;
