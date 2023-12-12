@@ -19,13 +19,13 @@ const filterShow = (type, ...arg) => {
   }
 
   // location 조건 추가 (location이 'all'이 아닐 때만)
-  if (location !== "all") {
+  if (location && location !== "all") {
     queryValue += " AND location LIKE ?";
     queryParams.push(`%${location}%`);
   }
 
   // progress 조건 추가
-  if (progress !== "all") {
+  if (progress && progress !== "all") {
     const today = getToday(); // 오늘 날짜
     switch (progress) {
       case "1": // 진행 중인 공연
@@ -46,11 +46,13 @@ const filterShow = (type, ...arg) => {
 
   // 공연일 경우 category 조건 추가
   if (type === "공연") {
-    if (category !== "all") {
+    if (category && category !== "all") {
       queryValue += " AND show_sub_type = ?";
       queryParams.push(category);
     }
   }
+
+  console.log(queryValue);
 
   return { queryValue, queryParams };
 };
