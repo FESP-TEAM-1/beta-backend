@@ -39,17 +39,17 @@ exports.getAllMember = async (req, res) => {
   } catch (err) {
     res.status(500).json({
       ok: false,
-      messge: err,
+      message: err,
     });
   }
 };
 
 // 유저 조회 (아이디로 조회)
 exports.getMember = async (req, res) => {
-  const { user_id } = req.params;
+  const { login_id } = req.params;
 
   try {
-    const result = await userDB.getMember(user_id);
+    const result = await userDB.getMember(login_id);
     res.status(200).json({
       ok: true,
       data: result,
@@ -57,15 +57,15 @@ exports.getMember = async (req, res) => {
   } catch (err) {
     res.status(500).json({
       ok: false,
-      messge: err,
+      message: err,
     });
   }
 };
 
 // 일반 유저 조회
-exports.getUser = async (req, res) => {
+exports.getUsers = async (req, res) => {
   try {
-    const result = await userDB.getUser();
+    const result = await userDB.getUsers();
     res.status(200).json({
       ok: true,
       data: result,
@@ -73,15 +73,15 @@ exports.getUser = async (req, res) => {
   } catch (err) {
     res.status(500).json({
       ok: false,
-      messge: err,
+      message: err,
     });
   }
 };
 
 // 관리자 조회
-exports.getAdmin = async (req, res) => {
+exports.getAdmins = async (req, res) => {
   try {
-    const result = await userDB.getAdmin();
+    const result = await userDB.getAdmins();
     res.status(200).json({
       ok: true,
       data: result,
@@ -89,16 +89,16 @@ exports.getAdmin = async (req, res) => {
   } catch (err) {
     res.status(500).json({
       ok: false,
-      messge: err,
+      message: err,
     });
   }
 };
 
 // 로그인 (JWT 생성)
 exports.login = async (req, res) => {
-  const { user_id, user_pw, user_role } = req.body;
+  const { login_id, login_pw, user_role } = req.body;
   try {
-    const user = await userDB.getMember(user_id, user_role);
+    const user = await userDB.getMember(login_id, user_role);
 
     // 아이디가 존재하지 않을 때
     if (user.length === 0) {
@@ -108,8 +108,8 @@ exports.login = async (req, res) => {
       });
     }
 
-    const blobToStr = Buffer.from(user[0].user_pw).toString("utf-8");
-    const isMatch = await hashCompare(user_pw, blobToStr);
+    const blobToStr = Buffer.from(user[0].login_pw).toString("utf-8");
+    const isMatch = await hashCompare(login_pw, blobToStr);
 
     // 비밀번호가 일치하지 않을 때
     if (!isMatch) {
@@ -121,9 +121,9 @@ exports.login = async (req, res) => {
     }
 
     const userInfo = {
-      user_id: user[0].user_id,
-      name: user[0].name,
-      user_type: user[0].user_type,
+      login_id: user[0].login_id,
+      user_name: user[0].user_name,
+      user_role: user[0].user_role,
     };
 
     // JWT access Token 생성
@@ -145,13 +145,20 @@ exports.login = async (req, res) => {
     });
 
     res.status(200).json({
-      user_id: user[0].user_id,
-      name: user[0].name,
-      user_type: user[0].user_type,
-      user_token: token,
+      ok: true,
+      data: {
+        login_id: user[0].login_id,
+        user_name: user[0].user_name,
+        user_role: user[0].user_role,
+        user_accessToken: accessToken,
+        user_refreshToken: refreshToken,
+      },
     });
   } catch (err) {
-    res.status(500).json(err);
+    res.status(500).json({
+      ok: false,
+      message: err,
+    });
   }
 };
 
@@ -192,9 +199,9 @@ exports.verifyToken = async (req, res) => {
   //   // 리프레시토큰 검증 성공
   //   const payload = jwt.getAccessTokenPayload(accessToken);
   //   const userInfo = {
-  //     user_id: payload.user_id,
+  //     login_id: payload.login_id,
   //     name: payload.name,
-  //     user_type: payload.user_type,
+  //     user_role: payload.user_role,
   //   };
   //   const newAccessToken = jwt.generateAccessToken(userInfo);
   //   res.cookie("accessToken", newAccessToken, {
@@ -216,11 +223,11 @@ exports.logout = async (req, res) => {
 
 // 회원가입
 exports.signup = async (req, res) => {
-  const { name, user_email, user_id, user_pw, birth_date, gender, phone_number, user_role } = req.body;
+  const { user_name, user_email, login_id, login_pw, birth_date, gender, phone_number, user_role } = req.body;
 
   try {
     // 아이디 중복 체크
-    const getUser = await userDB.getMember(user_id);
+    const getUser = await userDB.getMember(login_id);
     if (getUser.length !== 0) {
       res.status(401).json({
         ok: false,
@@ -230,11 +237,10 @@ exports.signup = async (req, res) => {
     }
 
     // 비밀번호 암호화
-    const hash = await pwToHash(user_pw);
+    const hash = await pwToHash(login_pw);
 
     // 회원가입
-    const unique_id = uuid();
-    await userDB.signUp([unique_id, name, user_email, user_id, hash, birth_date, gender, phone_number, user_role]);
+    await userDB.signUp([user_name, user_email, login_id, hash, birth_date, gender, phone_number, user_role]);
 
     res.status(200).json({
       ok: true,
