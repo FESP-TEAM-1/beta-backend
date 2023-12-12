@@ -4,9 +4,15 @@ const imageDB = require("../models/image-db");
 exports.getBannerImgs = async (req, res) => {
   try {
     const result = await imageDB.getBannerImgs();
-    res.status(200).json(result);
+    res.status(200).json({
+      ok: true,
+      data: result,
+    });
   } catch (err) {
-    res.status(500).json({ messge: err });
+    res.status(500).json({
+      ok: false,
+      messge: err,
+    });
   }
 };
 
@@ -15,19 +21,31 @@ exports.getShowImgs = async (req, res) => {
   try {
     const { show_id } = req.params;
     const result = await imageDB.getShowImgs(show_id);
-    res.status(200).json(result);
+    res.status(200).json({
+      ok: true,
+      data: result,
+    });
   } catch (err) {
-    res.status(500).json({ messge: err });
+    res.status(500).json({
+      ok: false,
+      messge: err,
+    });
   }
 };
 
 // story_id에 따른 이미지 조회
-exports.getStoryImg = async (req, res) => {
+exports.getStoryImgs = async (req, res) => {
   try {
     const { story_id } = req.params;
-    const result = await imageDB.getStoryImg(story_id);
-    res.status(200).json(result);
+    const result = await imageDB.getStoryImgs(story_id);
+    res.status(200).json({
+      ok: true,
+      data: result,
+    });
   } catch (err) {
-    res.status(500).json({ messge: err });
+    res.status(500).json({
+      ok: false,
+      messge: err,
+    });
   }
 };

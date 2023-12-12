@@ -9,7 +9,7 @@ const rollback = util.promisify(db.rollback).bind(db); // 트랜잭션 롤백 (�
 // 전체 유저 조회
 exports.getAllMember = async () => {
   try {
-    const result = await query(`SELECT idx, unique_id, name, user_email, user_id, birth_date, gender, phone_number, user_type, created_at FROM user`);
+    const result = await query(`SELECT id, user_name, user_email, login_id, birth_date, gender, phone_number, user_role, created_at FROM user`);
     return result;
   } catch (err) {
     throw err;
@@ -17,12 +17,9 @@ exports.getAllMember = async () => {
 };
 
 // 유저 조회 (아이디, 타입으로 조회)
-exports.getMember = async (user_id, user_role) => {
+exports.getMember = async (login_id) => {
   try {
-    const result = await query(
-      `SELECT idx, unique_id, name, user_email, user_id, user_pw, birth_date, gender, phone_number, user_role, created_at FROM user WHERE user_id = ? and user_role = ?`,
-      [user_id, user_role]
-    );
+    const result = await query(`SELECT id, user_name, user_email FROM user WHERE login_id = ?`, [login_id]);
     return result;
   } catch (err) {
     throw err;
@@ -30,10 +27,10 @@ exports.getMember = async (user_id, user_role) => {
 };
 
 // 일반 유저 전체 조회
-exports.getUser = async () => {
+exports.getUsers = async () => {
   try {
     const result = await query(
-      `SELECT idx, unique_id, name, user_email, user_id, birth_date, gender, phone_number, user_type, created_at FROM user WHERE user_type="User"`
+      `SELECT id, user_name, user_email, login_id, birth_date, gender, phone_number, user_role, created_at FROM user WHERE user_role="User"`
     );
     return result;
   } catch (err) {
@@ -42,10 +39,10 @@ exports.getUser = async () => {
 };
 
 // 관리자 전체 조회
-exports.getAdmin = async () => {
+exports.getAdmins = async () => {
   try {
     const result = await query(
-      `SELECT idx, unique_id, name, user_email, user_id, birth_date, gender, phone_number, user_type, created_at FROM user WHERE user_type="Admin"`
+      `SELECT id, user_name, user_email, login_id, birth_date, gender, phone_number, user_role, created_at FROM user WHERE user_role="Admin"`
     );
     return result;
   } catch (err) {
@@ -55,12 +52,12 @@ exports.getAdmin = async () => {
 
 // 회원가입
 exports.signUp = async (data) => {
-  const [unique_id, name, user_email, user_id, hash, birth_date, gender, phone_number, user_role] = data;
-  const user_pw = hash;
+  const [user_name, user_email, login_id, hash, birth_date, gender, phone_number, user_role] = data;
+  const login_pw = hash;
   try {
     const result = await query(
-      `INSERT INTO user (unique_id, name, user_email, user_id, user_pw, birth_date, gender, phone_number, user_role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [unique_id, name, user_email, user_id, user_pw, birth_date, gender, phone_number, user_role]
+      `INSERT INTO user (user_name, user_email, login_id, login_pw, birth_date, gender, phone_number, user_role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [user_name, user_email, login_id, login_pw, birth_date, gender, phone_number, user_role]
     );
     return result;
   } catch (err) {

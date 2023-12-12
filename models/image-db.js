@@ -25,3 +25,13 @@ exports.getShowImgs = async (show_id) => {
     throw err;
   }
 };
+
+// story_id에 따른 이미지 조회
+exports.getStoryImgs = async (story_id) => {
+  try {
+    const result = await query(`SELECT id, story_id, main_image_url, sub_images_url FROM story WHERE id = ?`, [story_id]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};

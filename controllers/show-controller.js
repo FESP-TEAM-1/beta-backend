@@ -18,7 +18,7 @@ exports.getConcerts = async (req, res) => {
       progress,
     });
 
-    res.status(200).json({ ok: true, result });
+    res.status(200).json({ ok: true, data: result });
   } catch (err) {
     res.status(500).json({ ok: false, messge: err });
   }
@@ -39,7 +39,7 @@ exports.getExhibitions = async (req, res) => {
       progress,
     });
 
-    res.status(200).json({ ok: true, result });
+    res.status(200).json({ ok: true, data: result });
   } catch (err) {
     res.status(500).json({ ok: false, messge: err });
   }
