@@ -4,9 +4,10 @@ const imageDB = require("../models/image-db");
 exports.getBannerImgs = async (req, res) => {
   try {
     const result = await imageDB.getBannerImgs();
+    const randomList = result.sort(() => Math.random() - 0.5);
     res.status(200).json({
       ok: true,
-      data: result,
+      data: randomList,
     });
   } catch (err) {
     res.status(500).json({
