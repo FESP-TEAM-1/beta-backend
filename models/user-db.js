@@ -16,10 +16,13 @@ exports.getAllMember = async () => {
   }
 };
 
-// 유저 조회 (아이디, 타입으로 조회)
+// 유저 조회 (아이디 조회)
 exports.getMember = async (login_id) => {
   try {
-    const result = await query(`SELECT id, user_name, user_email FROM user WHERE login_id = ?`, [login_id]);
+    const result = await query(
+      `SELECT id, user_name, user_email, login_id, birth_date, gender, phone_number, user_role, created_at FROM user WHERE login_id = ?`,
+      [login_id]
+    );
     return result;
   } catch (err) {
     throw err;
