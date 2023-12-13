@@ -50,3 +50,13 @@ exports.getExhibition = async ({ show_id }) => {
     throw err;
   }
 };
+
+// show_id에 따른 공연, 전시 예약 정보 조회
+exports.getShowReservation = async ({ show_id }) => {
+  try {
+    const result = await query(`SELECT * FROM show_reservation_info WHERE id = ?`, [show_id]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
