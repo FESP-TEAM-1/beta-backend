@@ -217,7 +217,7 @@ exports.logout = async (req, res) => {
   res.clearCookie("token");
   res.status(200).json({
     ok: true,
-    message: "Logout successful",
+    data: "Logout successful",
   });
 };
 
@@ -244,7 +244,7 @@ exports.signup = async (req, res) => {
 
     res.status(200).json({
       ok: true,
-      message: "회원가입 성공!!!",
+      data: "회원가입 성공!!!",
     });
   } catch (err) {
     console.error(err);
