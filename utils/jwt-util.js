@@ -9,38 +9,17 @@ exports.generateAccessToken = (user) => {
 };
 
 // refresh Token 생성
-exports.generateRefreshToken = () => {
-  return jwt.sign({}, secret_key, {
+exports.generateRefreshToken = (user) => {
+  return jwt.sign(user, secret_key, {
     expiresIn: "7d",
   });
 };
 
-// access Token 검증
-exports.verifyAccessToken = (accessToken) => {
+// 토큰 검증
+exports.verifyToken = (token) => {
   try {
-    jwt.verify(accessToken, secret_key);
-    return true;
+    return jwt.verify(token, secret_key);
   } catch (err) {
-    return false;
-  }
-};
-
-// refresh Token 검증
-exports.verifyRefreshToken = (refreshToken) => {
-  try {
-    jwt.verify(refreshToken, secret_key);
-    return true;
-  } catch (err) {
-    return false;
-  }
-};
-
-const getAccessTokenPayload = (accessToken) => {
-  try {
-    const payload = jwt.verify(accessToken, secret_key);
-    return payload;
-  } catch (err) {
-    console.log(err);
     return null;
   }
 };
