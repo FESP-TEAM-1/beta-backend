@@ -98,7 +98,7 @@ exports.getAdmins = async (req, res) => {
 exports.login = async (req, res) => {
   const { login_id, login_pw, user_role } = req.body;
   try {
-    const user = await userDB.getMember(login_id, user_role);
+    const user = await userDB.getMemberAllInfo(login_id, user_role);
 
     // 아이디가 존재하지 않을 때
     if (user.length === 0) {
@@ -130,7 +130,7 @@ exports.login = async (req, res) => {
     const accessToken = jwt.generateAccessToken(userInfo);
 
     // JWT refresh Token 생성
-    const refreshToken = jwt.generateRefreshToken();
+    const refreshToken = jwt.generateRefreshToken(userInfo);
 
     // JWT 쿠키에 저장
     res.cookie("accessToken", accessToken, {
@@ -164,52 +164,61 @@ exports.login = async (req, res) => {
 
 // access Token 검증
 exports.verifyToken = async (req, res) => {
-  const accessToken = req.cookies.accessToken; // 쿠키에서 엑세스토큰 획득
-  const refreshToken = req.cookies.refreshToken; // 쿠키에서 리프레시토큰 획득
+  // const token = req.headers.authorization.split(" ")[1];
+  const accessToken = req.cookies.accessToken;
+  const decoded = jwt.verifyToken(accessToken);
+  console.log("accessToken", decoded);
 
-  // 엑세스토큰이 없을 때
-  if (!accessToken) {
+  if (decoded) {
+    res.status(200).json({
+      ok: true,
+      data: decoded,
+    });
+  } else {
     res.status(401).json({
       ok: false,
-      message: "로그인 해주시기 바랍니다.",
+      message: "Invalid Token",
     });
-    return;
   }
-  if (!refreshToken) {
+};
+
+// refresh Token 검증
+exports.refreshToken = async (req, res) => {
+  // const { refreshToken } = req.body;
+  const refreshToken = req.cookies.refreshToken;
+  const decoded = jwt.verifyToken(refreshToken);
+  console.log("refreshToken", decoded);
+
+  if (decoded) {
+    const user = await userDB.getMember(decoded.login_id);
+    const userInfo = {
+      login_id: user[0].login_id,
+      user_name: user[0].user_name,
+      user_role: user[0].user_role,
+    };
+    const newAccessToken = jwt.generateAccessToken(userInfo);
+
+    res.cookie("accessToken", newAccessToken, {
+      httpOnly: true,
+      sameSite: "None",
+      secure: true,
+    });
+
+    res.status(200).json({
+      ok: true,
+      data: {
+        login_id: user[0].login_id,
+        user_name: user[0].user_name,
+        user_role: user[0].user_role,
+        user_accessToken: newAccessToken,
+      },
+    });
+  } else {
     res.status(401).json({
       ok: false,
-      message: "로그인 해주시기 바랍니다.",
+      message: "Invalid refreshToken",
     });
-    return;
   }
-
-  // // 엑세스토큰 검증
-  // const isAccessTokenValid = jwt.verifyAccessToken(accessToken);
-  // if (!isAccessTokenValid) {
-  //   // 리프레시토큰 검증
-  //   const isRefreshTokenValid = jwt.verifyRefreshToken(refreshToken);
-  //   if (!isRefreshTokenValid) {
-  //     res.status(401).json({
-  //       ok: false,
-  //       message: "로그인 해주시기 바랍니다.",
-  //     });
-  //     return;
-  //   }
-
-  //   // 리프레시토큰 검증 성공
-  //   const payload = jwt.getAccessTokenPayload(accessToken);
-  //   const userInfo = {
-  //     login_id: payload.login_id,
-  //     name: payload.name,
-  //     user_role: payload.user_role,
-  //   };
-  //   const newAccessToken = jwt.generateAccessToken(userInfo);
-  //   res.cookie("accessToken", newAccessToken, {
-  //     httpOnly: true,
-  //     sameSite: "None",
-  //     secure: true,
-  //   });
-  // }
 };
 
 // 로그아웃
