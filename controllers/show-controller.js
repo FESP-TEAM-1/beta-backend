@@ -68,3 +68,15 @@ exports.getExhibition = async (req, res) => {
     res.status(500).json({ ok: false, messge: err });
   }
 };
+
+// show_id에 따른 공연, 전시 예약 정보 조회
+exports.getShowReservation = async (req, res) => {
+  try {
+    const { show_id } = req.params;
+    const result = await showDB.getShowReservation({ show_id });
+
+    res.status(200).json({ ok: true, data: result });
+  } catch (err) {
+    res.status(500).json({ ok: false, messge: err });
+  }
+};
