@@ -1,4 +1,5 @@
 const storyDB = require("../models/story-db");
+const { imageUpload } = require("../middleware/imageUpload");
 
 // 최신 스토리 8개 조회
 exports.getStoryLimit = async (req, res) => {
@@ -30,4 +31,9 @@ exports.getStoryAll = async (req, res) => {
       messge: err,
     });
   }
+};
+
+// 스토리 업로드
+exports.postStoryUpload = async (req, res) => {
+  const { images, tags, userID } = req.body;
 };
