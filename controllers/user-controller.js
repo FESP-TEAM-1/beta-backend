@@ -150,8 +150,6 @@ exports.login = async (req, res) => {
         login_id: user[0].login_id,
         user_name: user[0].user_name,
         user_role: user[0].user_role,
-        user_accessToken: accessToken,
-        user_refreshToken: refreshToken,
       },
     });
   } catch (err) {
@@ -164,10 +162,8 @@ exports.login = async (req, res) => {
 
 // access Token 검증
 exports.verifyToken = async (req, res) => {
-  // const token = req.headers.authorization.split(" ")[1];
   const accessToken = req.cookies.accessToken;
   const decoded = jwt.verifyToken(accessToken);
-  console.log("accessToken", decoded);
 
   if (decoded) {
     res.status(200).json({
@@ -184,10 +180,8 @@ exports.verifyToken = async (req, res) => {
 
 // refresh Token 검증
 exports.refreshToken = async (req, res) => {
-  // const { refreshToken } = req.body;
   const refreshToken = req.cookies.refreshToken;
   const decoded = jwt.verifyToken(refreshToken);
-  console.log("refreshToken", decoded);
 
   if (decoded) {
     const user = await userDB.getMember(decoded.login_id);
@@ -210,7 +204,6 @@ exports.refreshToken = async (req, res) => {
         login_id: user[0].login_id,
         user_name: user[0].user_name,
         user_role: user[0].user_role,
-        user_accessToken: newAccessToken,
       },
     });
   } else {
@@ -223,7 +216,8 @@ exports.refreshToken = async (req, res) => {
 
 // 로그아웃
 exports.logout = async (req, res) => {
-  res.clearCookie("token");
+  res.clearCookie("accessToken");
+  res.clearCookie("refreshToken");
   res.status(200).json({
     ok: true,
     data: "Logout successful",
