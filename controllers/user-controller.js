@@ -144,6 +144,8 @@ exports.login = async (req, res) => {
       secure: true,
     });
 
+    await userDB.insertUserLog(user[0].user_role, user[0].login_id);
+
     res.status(200).json({
       ok: true,
       data: {

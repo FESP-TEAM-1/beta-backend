@@ -76,3 +76,13 @@ exports.signUp = async (data) => {
     throw err;
   }
 };
+
+// 로그인 시 로그 기록
+exports.insertUserLog = async (user_role, login_id) => {
+  try {
+    const result = await query(`INSERT INTO user_log (user_role, login_id) VALUES (?, ?)`, [user_role, login_id]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
