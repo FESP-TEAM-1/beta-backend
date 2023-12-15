@@ -126,7 +126,7 @@ exports.uploadShow = [
       // 트랜잭션 커밋
       await commit();
 
-      res.status(200).json({ ok: true, message: "업로드 성공" });
+      res.status(200).json({ ok: true, data: "업로드 성공" });
     } catch (err) {
       await rollback(); // 오류 발생 시 트랜잭션 롤백
       console.log(err.message);
