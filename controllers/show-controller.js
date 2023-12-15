@@ -84,6 +84,7 @@ exports.uploadShow = [
   async (req, res) => {
     try {
       const mainImage = req.files.mainImage;
+      const mainImageColor = req.body.main_image_color;
       const main_image_url = mainImage[0].key.replace("show/", "");
 
       // 트랜잭션 시작
@@ -121,7 +122,7 @@ exports.uploadShow = [
       }
 
       // 공연, 전시 메인 이미지 등록
-      await showDB.insertMainImage({ show_id: insertId, main_image_url: `/show/${main_image_url}` });
+      await showDB.insertMainImage({ show_id: insertId, main_image_url: `/show/${main_image_url}`, image_color: mainImageColor });
 
       // 트랜잭션 커밋
       await commit();
