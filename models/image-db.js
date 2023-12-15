@@ -9,7 +9,7 @@ const rollback = util.promisify(db.rollback).bind(db); // 트랜잭션 롤백 (�
 // 전체 배너 이미지 조회
 exports.getBannerImgs = async () => {
   try {
-    const result = await query(`SELECT * FROM main_image order by updated_at desc limit 5`);
+    const result = await query(`SELECT * FROM banner_image order by updated_at desc limit 5`);
     return result;
   } catch (err) {
     throw err;
