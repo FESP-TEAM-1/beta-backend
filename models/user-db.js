@@ -29,6 +29,15 @@ exports.getMember = async (login_id) => {
   }
 };
 
+exports.getMemberAllInfo = async (login_id, user_role) => {
+  try {
+    const result = await query(`SELECT * FROM user WHERE login_id = ? and user_role = ?`, [login_id, user_role]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
 // 일반 유저 전체 조회
 exports.getUsers = async () => {
   try {
