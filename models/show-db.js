@@ -32,19 +32,9 @@ exports.getFilterExhibitions = async ({ location, start_date, end_date, progress
 };
 
 // show_id에 따른 공연 조회
-exports.getConcert = async ({ show_id }) => {
+exports.getShow = async ({ show_id }) => {
   try {
-    const result = await query(`SELECT * FROM showing WHERE show_type = '공연' AND id = ?`, [show_id]);
-    return result;
-  } catch (err) {
-    throw err;
-  }
-};
-
-// show_id에 따른 전시 조회
-exports.getExhibition = async ({ show_id }) => {
-  try {
-    const result = await query(`SELECT * FROM showing WHERE show_type = '전시' AND id = ?`, [show_id]);
+    const result = await query(`SELECT * FROM showing WHERE id = ?`, [show_id]);
     return result;
   } catch (err) {
     throw err;

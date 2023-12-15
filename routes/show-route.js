@@ -4,8 +4,7 @@ const showController = require("../controllers/show-controller");
 
 router.get("/concert", showController.getFilterConcerts);
 router.get("/exhibition", showController.getFilterExhibitions);
-router.get("/concert/:show_id", showController.getConcert);
-router.get("/exhibition/:show_id", showController.getExhibition);
+router.get("/detail/:show_id", showController.getShow);
 router.get("/show/reservation/:show_id", showController.getShowReservation);
 
 module.exports = router;

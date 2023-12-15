@@ -46,22 +46,10 @@ exports.getFilterExhibitions = async (req, res) => {
 };
 
 // show_id에 따른 공연 조회
-exports.getConcert = async (req, res) => {
+exports.getShow = async (req, res) => {
   try {
     const { show_id } = req.params;
-    const result = await showDB.getConcert({ show_id });
-
-    res.status(200).json({ ok: true, data: result });
-  } catch (err) {
-    res.status(500).json({ ok: false, messge: err });
-  }
-};
-
-// show_id에 따른 전시 조회
-exports.getExhibition = async (req, res) => {
-  try {
-    const { show_id } = req.params;
-    const result = await showDB.getExhibition({ show_id });
+    const result = await showDB.getShow({ show_id });
 
     res.status(200).json({ ok: true, data: result });
   } catch (err) {
