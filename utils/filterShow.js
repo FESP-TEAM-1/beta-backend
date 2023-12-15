@@ -52,8 +52,6 @@ const filterShow = (type, ...arg) => {
     }
   }
 
-  console.log(queryValue);
-
   return { queryValue, queryParams };
 };
 
