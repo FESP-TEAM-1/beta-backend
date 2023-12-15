@@ -62,6 +62,7 @@ exports.insertShow = async ({ ...args }) => {
     location_detail,
     position,
     main_image_url,
+    main_image_color,
     sub_images_url,
     univ,
     department,
@@ -72,7 +73,7 @@ exports.insertShow = async ({ ...args }) => {
 
   try {
     const res = await query(
-      `INSERT INTO showing (show_type, show_sub_type, title, start_date, end_date, location, location_detail, position, main_image_url, sub_images_url, univ, department, tags, content, is_reservation) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO showing (show_type, show_sub_type, title, start_date, end_date, location, location_detail, position, main_image_url, main_image_color, sub_images_url, univ, department, tags, content, is_reservation) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         show_type,
         show_sub_type,
@@ -83,6 +84,7 @@ exports.insertShow = async ({ ...args }) => {
         location_detail,
         position,
         main_image_url,
+        main_image_color,
         sub_images_url,
         univ,
         department,
@@ -114,10 +116,10 @@ exports.insertShowReservation = async ({ ...args }) => {
 };
 
 exports.insertMainImage = async ({ ...args }) => {
-  const { show_id, main_image_url } = args;
+  const { show_id, main_image_url, image_color } = args;
 
   try {
-    const res = await query(`INSERT INTO main_image (show_id, image_url) VALUES (?, ?)`, [show_id, main_image_url]);
+    const res = await query(`INSERT INTO banner_image (show_id, image_url, image_color) VALUES (?, ?, ?)`, [show_id, main_image_url, image_color]);
 
     return true;
   } catch (err) {
