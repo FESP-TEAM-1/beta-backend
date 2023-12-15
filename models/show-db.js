@@ -32,19 +32,9 @@ exports.getFilterExhibitions = async ({ location, start_date, end_date, progress
 };
 
 // show_id에 따른 공연 조회
-exports.getConcert = async ({ show_id }) => {
+exports.getShow = async ({ show_id }) => {
   try {
-    const result = await query(`SELECT * FROM showing WHERE show_type = '공연' AND id = ?`, [show_id]);
-    return result;
-  } catch (err) {
-    throw err;
-  }
-};
-
-// show_id에 따른 전시 조회
-exports.getExhibition = async ({ show_id }) => {
-  try {
-    const result = await query(`SELECT * FROM showing WHERE show_type = '전시' AND id = ?`, [show_id]);
+    const result = await query(`SELECT * FROM showing WHERE id = ?`, [show_id]);
     return result;
   } catch (err) {
     throw err;
@@ -56,6 +46,80 @@ exports.getShowReservation = async ({ show_id }) => {
   try {
     const result = await query(`SELECT * FROM show_reservation_info WHERE show_id = ?`, [show_id]);
     return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
+exports.insertShow = async ({ ...args }) => {
+  const {
+    show_type,
+    show_sub_type,
+    title,
+    start_date,
+    end_date,
+    location,
+    location_detail,
+    position,
+    main_image_url,
+    sub_images_url,
+    univ,
+    department,
+    tags,
+    content,
+    is_reservation,
+  } = args;
+
+  try {
+    const res = await query(
+      `INSERT INTO showing (show_type, show_sub_type, title, start_date, end_date, location, location_detail, position, main_image_url, sub_images_url, univ, department, tags, content, is_reservation) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        show_type,
+        show_sub_type,
+        title,
+        start_date,
+        end_date,
+        location,
+        location_detail,
+        position,
+        main_image_url,
+        sub_images_url,
+        univ,
+        department,
+        tags,
+        content,
+        is_reservation,
+      ]
+    );
+
+    return res.insertId;
+  } catch (err) {
+    throw err;
+  }
+};
+
+exports.insertShowReservation = async ({ ...args }) => {
+  const { show_id, method, google_form_url, location, position, price, head_count, notice } = args;
+
+  try {
+    const res = await query(
+      `INSERT INTO show_reservation_info (show_id, method, google_form_url, location, position, price, head_count, notice) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [show_id, method, google_form_url, location, position, price, head_count, notice]
+    );
+
+    return true;
+  } catch (err) {
+    throw err;
+  }
+};
+
+exports.insertMainImage = async ({ ...args }) => {
+  const { show_id, main_image_url } = args;
+
+  try {
+    const res = await query(`INSERT INTO main_image (show_id, image_url) VALUES (?, ?)`, [show_id, main_image_url]);
+
+    return true;
   } catch (err) {
     throw err;
   }

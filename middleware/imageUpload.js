@@ -1,40 +1,55 @@
 const multer = require("multer");
 const { v4: uuid } = require("uuid");
 const mime = require("mime-types");
+const { s3Client } = require("../aws");
 const multerS3 = require("multer-s3");
-const { s3 } = require("../aws");
 
-// 서버에 이미지 저장 로직
-// const storage = multer.diskStorage({
-//   destination: (req, file, cb) => cb(null, "./images"),
-//   filename: (req, file, cb) => {
-//     const extension = mime.extension(file.mimetype);
-//     cb(null, `${uuid()}.${extension}`);
-//   },
-// });
+// show_id에 따른 공연, 전시 이미지 저장
+const uploadShowImg = (fields) => {
+  return multer({
+    storage: multerS3({
+      s3: s3Client,
+      bucket: process.env.AWS_S3_BUCKET_NAME,
+      contentType: multerS3.AUTO_CONTENT_TYPE,
+      key: function (req, file, cb) {
+        const extension = mime.extension(file.mimetype);
+        cb(null, `show/${uuid()}.${extension}`);
+      },
+    }),
+    fileFilter: (req, file, cb) => {
+      if (["image/png", "image/jpeg", "image/jpg"].includes(file.mimetype)) {
+        cb(null, true);
+      } else {
+        cb(new Error("Invalid file type, only JPEG, PNG, and JPG are allowed!"), false);
+      }
+    },
+    limits: {
+      fileSize: 1024 * 1024 * 5, // 5 MB
+    },
+  }).fields(fields);
+};
 
-// AWS S3에 이미지 저장 로직
-const storage = multerS3({
-  s3,
-  bucket: "beta-s3-bucket",
-  key: (req, file, cb) => {
-    const extension = mime.extension(file.mimetype);
-    cb(null, `${uuid()}.${extension}`); // 만약 폴더 안에 저장하고 싶다면, `${folderName}/${uuid()}.${extension}`
-  },
-});
-
-const upload = multer({
-  storage,
+// story 이미지 저장
+const uploadStoryImg = multer({
+  storage: multerS3({
+    s3: s3Client,
+    bucket: process.env.AWS_S3_BUCKET_NAME,
+    contentType: multerS3.AUTO_CONTENT_TYPE,
+    key: function (req, file, cb) {
+      const extension = mime.extension(file.mimetype);
+      cb(null, `story/${uuid()}.${extension}`);
+    },
+  }),
   fileFilter: (req, file, cb) => {
-    if (file.mimetype === "image/png" || file.mimetype === "image/jpeg" || file.mimetype === "image/jpg") {
+    if (["image/png", "image/jpeg", "image/jpg"].includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error("Invalid file type, only JPEG and PNG is allowed!"), false);
+      cb(new Error("Invalid file type, only JPEG, PNG, and JPG are allowed!"), false);
     }
   },
   limits: {
-    fileSize: 1024 * 1024 * 3,
+    fileSize: 1024 * 1024 * 5, // 5 MB
   },
 });
 
-module.exports = { upload };
+module.exports = { uploadShowImg, uploadStoryImg };
