@@ -23,7 +23,7 @@ exports.sendEmail = async (req, res) => {
     await emailDB.insertEmailCode(user_email, VERIFICATION_CODE);
     res.status(200).json({
       ok: true,
-      data: "이메일 전송 성공",
+      data: "이메일 전송 완료",
     });
   } catch (err) {
     console.error(err);
@@ -53,7 +53,10 @@ exports.verifyCode = async (req, res) => {
       return;
     }
 
-    if (code === getCode) {
+    const codeBufferData = new Uint8Array(getCode);
+    const codeDecodedString = new TextDecoder("utf-8").decode(codeBufferData);
+
+    if (code === codeDecodedString) {
       res.status(200).json({
         ok: true,
         data: "인증 성공",
