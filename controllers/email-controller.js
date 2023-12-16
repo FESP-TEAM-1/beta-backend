@@ -31,6 +31,7 @@ exports.sendEmail = async (req, res) => {
       ok: false,
       message: err.message,
     });
+    return;
   }
 };
 
@@ -62,6 +63,7 @@ exports.verifyCode = async (req, res) => {
         ok: false,
         message: "인증 실패",
       });
+      return;
     }
   } catch (err) {
     console.error(err);
@@ -69,5 +71,6 @@ exports.verifyCode = async (req, res) => {
       ok: false,
       message: err.message,
     });
+    return;
   }
 };

@@ -37,10 +37,12 @@ exports.getAllMember = async (req, res) => {
       data: result,
     });
   } catch (err) {
+    console.error(err);
     res.status(500).json({
       ok: false,
       message: err,
     });
+    return;
   }
 };
 
@@ -55,10 +57,12 @@ exports.getMember = async (req, res) => {
       data: result,
     });
   } catch (err) {
+    console.error(err);
     res.status(500).json({
       ok: false,
       message: err,
     });
+    return;
   }
 };
 
@@ -71,10 +75,12 @@ exports.getUsers = async (req, res) => {
       data: result,
     });
   } catch (err) {
+    console.error(err);
     res.status(500).json({
       ok: false,
       message: err,
     });
+    return;
   }
 };
 
@@ -87,10 +93,12 @@ exports.getAdmins = async (req, res) => {
       data: result,
     });
   } catch (err) {
+    console.error(err);
     res.status(500).json({
       ok: false,
       message: err,
     });
+    return;
   }
 };
 
@@ -106,6 +114,7 @@ exports.login = async (req, res) => {
         ok: false,
         message: "존재하지 않는 아이디입니다.",
       });
+      return;
     }
 
     const blobToStr = Buffer.from(user[0].login_pw).toString("utf-8");
@@ -155,10 +164,12 @@ exports.login = async (req, res) => {
       },
     });
   } catch (err) {
+    console.error(err);
     res.status(500).json({
       ok: false,
       message: err,
     });
+    return;
   }
 };
 
@@ -177,6 +188,7 @@ exports.verifyToken = async (req, res) => {
       ok: false,
       message: "Invalid Token",
     });
+    return;
   }
 };
 
@@ -213,6 +225,7 @@ exports.refreshToken = async (req, res) => {
       ok: false,
       message: "Invalid refreshToken",
     });
+    return;
   }
 };
 
@@ -257,5 +270,6 @@ exports.signup = async (req, res) => {
       ok: false,
       message: "회원가입 실패...",
     });
+    return;
   }
 };
