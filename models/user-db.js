@@ -68,7 +68,7 @@ exports.signUp = async (data) => {
   const login_pw = hash;
   try {
     const result = await query(
-      `INSERT INTO user (user_name, user_email, login_id, login_pw, birth_date, gender, phone_number, user_role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO user (user_name, user_email, login_id, login_pw, birth_date, gender, phone_number, user_role) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [user_name, user_email, login_id, login_pw, birth_date, gender, phone_number, user_role]
     );
     return result;
