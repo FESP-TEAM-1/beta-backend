@@ -209,6 +209,8 @@ exports.refreshToken = async (req, res) => {
       },
     });
   } else {
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
     res.status(401).json({
       ok: false,
       message: "Invalid refreshToken",
