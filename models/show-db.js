@@ -180,7 +180,7 @@ exports.addReview = async ({ ...args }) => {
 };
 
 // 리뷰 수정
-exports.modifyReview = async ({ ...args }) => {
+exports.updateReview = async ({ ...args }) => {
   const { review_id, show_id, user_id, comment } = args;
 
   try {
@@ -205,6 +205,32 @@ exports.deleteReview = async ({ ...args }) => {
     const res = await query(`DELETE FROM user_reviews WHERE id = ? AND show_id = ? AND user_id = ?`, [review_id, show_id, user_id]);
 
     return true;
+  } catch (err) {
+    throw err;
+  }
+};
+
+// 마이페이지 - 유저 공연, 전시 좋아요 조회
+exports.getUserLike = async ({ ...args }) => {
+  const { user_id } = args;
+
+  try {
+    const res = await query(`SELECT * FROM user_likes WHERE user_id = ? ORDER BY created_at DESC`, [user_id]);
+
+    return res;
+  } catch (err) {
+    throw err;
+  }
+};
+
+// 마이페이지 - 유저 공연, 전시 리뷰 조회
+exports.getUserReview = async ({ ...args }) => {
+  const { user_id } = args;
+
+  try {
+    const res = await query(`SELECT * FROM user_reviews WHERE user_id = ? ORDER BY updated_at DESC`, [user_id]);
+
+    return res;
   } catch (err) {
     throw err;
   }

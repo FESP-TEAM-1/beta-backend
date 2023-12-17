@@ -206,14 +206,14 @@ exports.addReview = async (req, res) => {
 };
 
 // 공연, 전시 리뷰 수정
-exports.modifyReview = async (req, res) => {
+exports.updateReview = async (req, res) => {
   try {
     const { review_id, show_id, login_id, comment } = req.body;
 
     const userInfo = await userDB.getMember(login_id);
     const user_id = userInfo[0].id;
 
-    const result = await showDB.modifyReview({ review_id, show_id, user_id, comment });
+    const result = await showDB.updateReview({ review_id, show_id, user_id, comment });
 
     res.status(200).json({ ok: true, data: result });
   } catch (err) {
@@ -230,6 +230,40 @@ exports.deleteReview = async (req, res) => {
     const user_id = userInfo[0].id;
 
     const result = await showDB.deleteReview({ review_id, show_id, user_id });
+
+    res.status(200).json({ ok: true, data: result });
+  } catch (err) {
+    res.status(500).json({ ok: false, message: err.message });
+  }
+};
+
+// 마이페이지 - 유저 공연, 전시 좋아요 조회
+exports.getUserLike = async (req, res) => {
+  try {
+    const user_login_id = req.login_id;
+
+    // 유저 정보 조회 user_id 가져오기
+    const userInfo = await userDB.getMember(user_login_id);
+    const user_id = userInfo[0].id;
+
+    const result = await showDB.getUserLike({ user_id });
+
+    res.status(200).json({ ok: true, data: result });
+  } catch (err) {
+    res.status(500).json({ ok: false, message: err.message });
+  }
+};
+
+// 마이페이지 - 유저 공연, 전시 리뷰 조회
+exports.getUserReview = async (req, res) => {
+  try {
+    const user_login_id = req.login_id;
+
+    // 유저 정보 조회 user_id 가져오기
+    const userInfo = await userDB.getMember(user_login_id);
+    const user_id = userInfo[0].id;
+
+    const result = await showDB.getUserReview({ user_id });
 
     res.status(200).json({ ok: true, data: result });
   } catch (err) {
