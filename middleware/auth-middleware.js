@@ -14,4 +14,12 @@ const showAuthenticate = (req, res, next) => {
   }
 };
 
-module.exports = { showAuthenticate };
+const storyAuthenticate = (req, res, next) => {
+  if (req.cookies.accessToken && jwt.verifyToken(req.cookies.accessToken)) {
+    next();
+  } else {
+    res.status(401).json({ ok: false, message: "로그인 해주시기 바랍니다." });
+  }
+};
+
+module.exports = { showAuthenticate, storyAuthenticate };

@@ -10,10 +10,12 @@ exports.getBannerImgs = async (req, res) => {
       data: randomList,
     });
   } catch (err) {
+    console.error(err);
     res.status(500).json({
       ok: false,
       messge: err,
     });
+    return;
   }
 };
 
@@ -27,10 +29,12 @@ exports.getShowImg = async (req, res) => {
       data: result,
     });
   } catch (err) {
+    console.error(err);
     res.status(500).json({
       ok: false,
       messge: err,
     });
+    return;
   }
 };
 
@@ -44,9 +48,11 @@ exports.getStoryImg = async (req, res) => {
       data: result,
     });
   } catch (err) {
+    console.error(err);
     res.status(500).json({
       ok: false,
       messge: err,
     });
+    return;
   }
 };

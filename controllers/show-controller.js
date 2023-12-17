@@ -27,7 +27,9 @@ exports.getFilterConcerts = async (req, res) => {
 
     res.status(200).json({ ok: true, data: result });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ ok: false, messge: err });
+    return;
   }
 };
 
@@ -48,7 +50,9 @@ exports.getFilterExhibitions = async (req, res) => {
 
     res.status(200).json({ ok: true, data: result });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ ok: false, messge: err });
+    return;
   }
 };
 
@@ -60,7 +64,9 @@ exports.getShow = async (req, res) => {
 
     res.status(200).json({ ok: true, data: result });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ ok: false, messge: err });
+    return;
   }
 };
 
@@ -83,7 +89,9 @@ exports.getShowReservation = async (req, res) => {
 
     res.status(200).json({ ok: true, data: result });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ ok: false, messge: err });
+    return;
   }
 };
 
@@ -144,6 +152,7 @@ exports.uploadShow = [
       await rollback(); // 오류 발생 시 트랜잭션 롤백
       console.log(err.message);
       res.status(500).json({ ok: false, message: err.message });
+      return;
     }
   },
 ];
