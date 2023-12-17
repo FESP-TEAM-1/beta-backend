@@ -123,6 +123,7 @@ exports.verifyCode = async (req, res) => {
 
 exports.verifyUnivCode = async (req, res) => {
   const { user_email, code, univName } = req.body;
+  const key = process.env.UNIVCERT_API_KEY;
 
   try {
     const nowTime = new Date();
