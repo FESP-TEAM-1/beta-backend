@@ -9,9 +9,7 @@ const rollback = util.promisify(db.rollback).bind(db); // 트랜잭션 롤백 (�
 // 최신 스토리 8개 조회
 exports.getStoryLimit = async () => {
   try {
-    const result = await query(
-      `SELECT a.*, b.login_id FROM story as a inner join user as b on a.user_id = b.id order by updated_at desc limit 8`
-    );
+    const result = await query(`SELECT a.*, b.login_id FROM story as a inner join user as b on a.user_id = b.id order by updated_at desc limit 8`);
     return result;
   } catch (err) {
     throw err;
@@ -21,9 +19,27 @@ exports.getStoryLimit = async () => {
 // 전체 스토리 조회
 exports.getStoryAll = async () => {
   try {
-    const result = await query(
-      `SELECT a.*, b.login_id FROM story as a inner join user as b on a.user_id = b.id order by updated_at desc`
-    );
+    const result = await query(`SELECT a.*, b.login_id FROM story as a inner join user as b on a.user_id = b.id order by updated_at desc`);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
+// story_id로 스토리 조회
+exports.getStory = async ({ story_id, user_id }) => {
+  try {
+    const result = await query(`SELECT * FROM story WHERE id = ? AND user_id = ?`, [story_id, user_id]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
+// user_id로 스토리 조회
+exports.getStoryUser = async ({ user_id }) => {
+  try {
+    const result = await query(`SELECT * FROM story WHERE user_id = ? ORDER BY updated_at DESC`, [user_id]);
     return result;
   } catch (err) {
     throw err;
@@ -33,12 +49,33 @@ exports.getStoryAll = async () => {
 // 스토리 업로드
 exports.postStoryUpload = async ({ user_id, story_image_url, tags, story_color }) => {
   try {
-    await query(`INSERT INTO story (user_id, story_image_url, tags, story_color) VALUES (?, ?, ?, ?)`, [
-      user_id,
-      story_image_url,
+    await query(`INSERT INTO story (user_id, story_image_url, tags, story_color) VALUES (?, ?, ?, ?)`, [user_id, story_image_url, tags, story_color]);
+    return true;
+  } catch (err) {
+    throw err;
+  }
+};
+
+// 스토리 수정
+exports.putStoryUpdate = async ({ story_id, user_id, story_image_url, tags, story_color }) => {
+  try {
+    await query(`UPDATE story SET tags = ?, story_image_url = ?, story_color = ? WHERE id = ? AND user_id = ?`, [
       tags,
+      story_image_url,
       story_color,
+      story_id,
+      user_id,
     ]);
+    return true;
+  } catch (err) {
+    throw err;
+  }
+};
+
+// 스토리 삭제
+exports.deleteStoryDelete = async ({ story_id, user_id }) => {
+  try {
+    await query(`DELETE FROM story WHERE id = ? AND user_id = ?`, [story_id, user_id]);
     return true;
   } catch (err) {
     throw err;
