@@ -275,3 +275,31 @@ exports.signup = async (req, res) => {
     return;
   }
 };
+
+// 회원정보 수정
+exports.updateUser = async (req, res) => {
+  try {
+    const { user_name, user_email, login_pw, birth_date, gender, phone_number } = req.body;
+    const user_login_id = req.login_id;
+
+    // 유저 정보 조회 user_id 가져오기
+    const userInfo = await userDB.getMember(user_login_id);
+    const user_id = userInfo[0].id;
+
+    const hash = await pwToHash(login_pw);
+
+    await userDB.updateUser({ user_id, user_name, user_email, hash, birth_date, gender, phone_number });
+
+    res.status(200).json({
+      ok: true,
+      data: "회원정보 수정 성공!!!",
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      ok: false,
+      message: "회원정보 수정 실패...",
+    });
+    return;
+  }
+};

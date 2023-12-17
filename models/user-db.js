@@ -86,3 +86,22 @@ exports.insertUserLog = async (user_role, login_id) => {
     throw err;
   }
 };
+
+// 회원 정보 수정
+exports.updateUser = async (data) => {
+  try {
+    const { user_id, user_name, user_email, hash, birth_date, gender, phone_number } = data;
+    await query(`UPDATE story SET user_name = ?, user_email = ?, login_pw = ?, birth_date = ?, gender = ?, phone_number = ?  WHERE id = ?`, [
+      user_name,
+      user_email,
+      hash,
+      birth_date,
+      gender,
+      phone_number,
+      user_id,
+    ]);
+    return true;
+  } catch (err) {
+    throw err;
+  }
+};
