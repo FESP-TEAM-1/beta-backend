@@ -34,7 +34,20 @@ exports.getFilterExhibitions = async ({ location, start_date, end_date, progress
 // show_id에 따른 공연 조회
 exports.getShow = async ({ show_id }) => {
   try {
-    const result = await query(`SELECT * FROM showing WHERE id = ?`, [show_id]);
+    const result = await query(
+      `SELECT s.*, COUNT(ul.show_id) AS likes_count FROM showing AS s LEFT JOIN user_likes AS ul ON s.id = ul.show_id WHERE s.id = ?`,
+      [show_id]
+    );
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
+// show_id에 따른 공연 리뷰 조회
+exports.getShowReview = async ({ show_id }) => {
+  try {
+    const result = await query(`SELECT * FROM user_reviews WHERE show_id = ? ORDER BY updated_at DESC`, [show_id]);
     return result;
   } catch (err) {
     throw err;
@@ -120,6 +133,76 @@ exports.insertMainImage = async ({ ...args }) => {
 
   try {
     const res = await query(`INSERT INTO banner_image (show_id, image_url, image_color) VALUES (?, ?, ?)`, [show_id, main_image_url, image_color]);
+
+    return true;
+  } catch (err) {
+    throw err;
+  }
+};
+
+// 좋아요 추가
+exports.addLike = async ({ ...args }) => {
+  const { show_id, user_id } = args;
+
+  try {
+    const res = await query(`INSERT INTO user_likes (show_id, user_id) VALUES (?, ?)`, [show_id, user_id]);
+
+    return true;
+  } catch (err) {
+    throw err;
+  }
+};
+
+// 좋아요 삭제
+exports.deleteLike = async ({ ...args }) => {
+  const { show_id, user_id } = args;
+
+  try {
+    const res = await query(`DELETE FROM user_likes WHERE show_id = ? AND user_id = ?`, [show_id, user_id]);
+
+    return true;
+  } catch (err) {
+    throw err;
+  }
+};
+
+// 리뷰 등록
+exports.addReview = async ({ ...args }) => {
+  const { show_id, user_id, comment } = args;
+
+  try {
+    const res = await query(`INSERT INTO user_reviews (show_id, user_id, comment) VALUES (?, ?, ?)`, [show_id, user_id, comment]);
+
+    return true;
+  } catch (err) {
+    throw err;
+  }
+};
+
+// 리뷰 수정
+exports.modifyReview = async ({ ...args }) => {
+  const { review_id, show_id, user_id, comment } = args;
+
+  try {
+    const res = await query(`UPDATE user_reviews SET comment = ? WHERE id = ? AND show_id = ? AND user_id = ?`, [
+      comment,
+      review_id,
+      show_id,
+      user_id,
+    ]);
+
+    return true;
+  } catch (err) {
+    throw err;
+  }
+};
+
+// 리뷰 삭제
+exports.deleteReview = async ({ ...args }) => {
+  const { review_id, show_id, user_id } = args;
+
+  try {
+    const res = await query(`DELETE FROM user_reviews WHERE id = ? AND show_id = ? AND user_id = ?`, [review_id, show_id, user_id]);
 
     return true;
   } catch (err) {
