@@ -44,6 +44,16 @@ exports.getShow = async ({ show_id }) => {
   }
 };
 
+// show_id, user_id에 따른 공연 조회
+exports.getShowWithUser = async ({ show_id, user_id }) => {
+  try {
+    const result = await query(`SELECT * FROM showing WHERE id = ? AND user_id = ?`, [show_id, user_id]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
 // show_id에 따른 공연 리뷰 조회
 exports.getShowReview = async ({ show_id }) => {
   try {
@@ -121,6 +131,18 @@ exports.insertShowReservation = async ({ ...args }) => {
       `INSERT INTO show_reservation_info (show_id, method, google_form_url, location, position, price, head_count, notice) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [show_id, method, google_form_url, location, position, price, head_count, notice]
     );
+
+    return true;
+  } catch (err) {
+    throw err;
+  }
+};
+
+exports.insertShowTimes = async ({ ...args }) => {
+  const { show_id, date_time, head_count } = args;
+
+  try {
+    const res = await query(`INSERT INTO show_times (show_id, date_time, head_count) VALUES (?, ?, ?)`, [show_id, date_time, head_count]);
 
     return true;
   } catch (err) {
@@ -231,6 +253,96 @@ exports.getUserReview = async ({ ...args }) => {
     const res = await query(`SELECT * FROM user_reviews WHERE user_id = ? ORDER BY updated_at DESC`, [user_id]);
 
     return res;
+  } catch (err) {
+    throw err;
+  }
+};
+
+exports.updateShow = async ({ ...args }) => {
+  const {
+    show_id,
+    show_type,
+    show_sub_type,
+    title,
+    start_date,
+    end_date,
+    location,
+    location_detail,
+    position,
+    main_image_url,
+    main_image_color,
+    sub_images_url,
+    univ,
+    department,
+    tags,
+    content,
+    is_reservation,
+  } = args;
+
+  try {
+    const res = await query(
+      `UPDATE showing SET show_type = ?, show_sub_type = ?, title = ?, start_date = ?, end_date = ?, location = ?, location_detail = ?, position = ?, main_image_url = ?, main_image_color = ?, sub_images_url = ?, univ = ?, department = ?, tags = ?, content = ?, is_reservation = ? WHERE id = ?`,
+      [
+        show_type,
+        show_sub_type,
+        title,
+        start_date,
+        end_date,
+        location,
+        location_detail,
+        position,
+        main_image_url,
+        main_image_color,
+        sub_images_url,
+        univ,
+        department,
+        tags,
+        content,
+        is_reservation,
+        show_id,
+      ]
+    );
+
+    return true;
+  } catch (err) {
+    throw err;
+  }
+};
+
+exports.updateShowReservation = async ({ ...args }) => {
+  const { show_id, method, google_form_url, location, position, price, head_count, notice } = args;
+
+  try {
+    const res = await query(
+      `UPDATE show_reservation_info SET method = ?, google_form_url = ?, location = ?, position = ?, price = ?, head_count = ?, notice = ? WHERE show_id = ?`,
+      [method, google_form_url, location, position, price, head_count, notice, show_id]
+    );
+
+    return true;
+  } catch (err) {
+    throw err;
+  }
+};
+
+exports.updateShowTimes = async ({ ...args }) => {
+  const { show_id, date_time, head_count } = args;
+
+  try {
+    const res = await query(`UPDATE show_times SET head_count = ?, date_time = ? WHERE show_id = ?`, [head_count, date_time, show_id]);
+
+    return true;
+  } catch (err) {
+    throw err;
+  }
+};
+
+exports.deleteShow = async ({ ...args }) => {
+  const { show_id, user_id } = args;
+
+  try {
+    const res = await query(`DELETE FROM showing WHERE id = ? AND user_id = ?`, [show_id, user_id]);
+
+    return true;
   } catch (err) {
     throw err;
   }

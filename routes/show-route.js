@@ -15,7 +15,9 @@ router.post("/show/upload", showController.uploadShow);
 router.post("/show/like-add", showController.addLike);
 router.post("/show/review-add", showController.addReview);
 router.patch("/show/review-update", showController.updateReview);
+router.put("/show/update", userAuthenticate, showController.updateShow); // showAuthenticate 이걸 추가하면 userAuthenticate를 빼야 함 관리자이기 때문에
 router.delete("/show/like-delete", showController.deleteLike);
 router.delete("/show/review-delete", showController.deleteReview);
+router.delete("/show/delete", userAuthenticate, showController.deleteShow); // showAuthenticate 이걸 추가하면 userAuthenticate를 빼야 함 관리자이기 때문에
 
 module.exports = router;

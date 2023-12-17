@@ -139,6 +139,12 @@ exports.uploadShow = [
       if (req.body.is_reservation === "1") {
         const { method, google_form_url, location, position, price, head_count, notice } = req.body;
         await showDB.insertShowReservation({ show_id: insertId, method, google_form_url, location, position, price, head_count, notice });
+
+        // method가 agency일 때, 회차 등록
+        if (method === "agency") {
+          const { date_time } = req.body;
+          await showDB.insertShowTimes({ show_id: insertId, date_time, head_count });
+        }
       }
 
       // 공연, 전시 메인 이미지 등록
@@ -267,6 +273,142 @@ exports.getUserReview = async (req, res) => {
 
     res.status(200).json({ ok: true, data: result });
   } catch (err) {
+    res.status(500).json({ ok: false, message: err.message });
+  }
+};
+
+exports.updateShow = [
+  uploadShowImg([
+    { name: "mainImage", maxCount: 1 },
+    { name: "subImages", maxCount: 9 },
+  ]),
+  async (req, res) => {
+    try {
+      const user_login_id = req.login_id;
+
+      // 유저 정보 조회 user_id 가져오기
+      const userInfo = await userDB.getMember(user_login_id);
+      const user_id = userInfo[0].id;
+
+      // 기존 공연, 전시 정보 조회
+      const showInfo = await showDB.getShowWithUser({ show_id: req.body.show_id, user_id });
+      if (showInfo.length === 0) {
+        res.status(404).json({ ok: false, message: "공연, 전시 정보가 존재하지 않습니다." });
+        return;
+      }
+
+      // 트랜잭션 시작
+      await beginTransaction();
+
+      // 메인 이미지 업데이트
+      let main_image_url = showInfo[0].main_image_url;
+      if (req.files.mainImage) {
+        main_image_url = `/${req.files.mainImage[0].key}`;
+        if (showInfo[0].main_image_url) {
+          await deleteFileFromS3(showInfo[0].main_image_url.slice(1));
+        }
+      }
+
+      // 서브 이미지 업데이트
+      let sub_images_url_string = showInfo[0].sub_images_url;
+      if (req.files.subImages) {
+        const subImages = req.files.subImages;
+        const clientSubImages = JSON.parse(req.body.sub_images_url);
+
+        // 기존 서브 이미지 목록
+        const existingSubImages = JSON.parse(showInfo[0].sub_images_url);
+        const sub_images_list = Object.keys(clientSubImages).map((key) => {
+          const originalName = clientSubImages[key];
+          const uploadedFile = subImages.find((file) => file.originalname === originalName);
+          return uploadedFile ? uploadedFile.key.replace("show/", "") : existingSubImages[key];
+        });
+
+        // 서버에 저장된 이미지 경로를 DB에 저장하기 위해 객체로 변환
+        const sub_images_url = sub_images_list.reduce((acc, current, index) => {
+          acc[index + 1] = `/show/${current}`;
+          return acc;
+        }, {});
+
+        sub_images_url_string = JSON.stringify(sub_images_url);
+
+        // 기존 서브 이미지 중 변경된 이미지 삭제
+        Object.values(existingSubImages).forEach(async (url, index) => {
+          if (!sub_images_list.includes(url.replace("/show/", ""))) {
+            await deleteFileFromS3(url.slice(1));
+          }
+        });
+      }
+
+      // 공연, 전시 업데이트
+      await showDB.updateShow({
+        ...req.body,
+        main_image_url,
+        sub_images_url: sub_images_url_string,
+      });
+
+      // is_reservation이 1일 때, 공연, 전시 예약 정보 업데이트
+      if (req.body.is_reservation === "1") {
+        const { method, google_form_url, location, position, price, head_count, notice } = req.body;
+        await showDB.updateShowReservation({
+          show_id: req.body.show_id,
+          method,
+          google_form_url,
+          location,
+          position,
+          price,
+          head_count,
+          notice,
+        });
+
+        // method가 agency일 때, 회차 업데이트
+        if (method === "agency") {
+          const { date_time } = req.body;
+          await showDB.updateShowTimes({ show_id: req.body.show_id, date_time, head_count });
+        }
+      }
+
+      await commit();
+
+      res.status(200).json({ ok: true, data: "업데이트 성공" });
+    } catch (err) {
+      await rollback(); // 오류 발생 시 트랜잭션 롤백
+      console.log(err.message);
+      res.status(500).json({ ok: false, message: err.message });
+      return;
+    }
+  },
+];
+
+exports.deleteShow = async (req, res) => {
+  try {
+    const { show_id, main_image_url, sub_images_url } = req.body;
+    const user_login_id = req.login_id;
+
+    const userInfo = await userDB.getMember(user_login_id);
+    const user_id = userInfo[0].id;
+
+    // 기존 공연, 전시 정보 조회
+    const showInfo = await showDB.getShowWithUser({ show_id: show_id, user_id });
+    if (showInfo.length === 0) {
+      res.status(404).json({ ok: false, message: "공연, 전시 정보가 존재하지 않습니다." });
+      return;
+    }
+
+    // 메인 이미지 삭제
+    await deleteFileFromS3(main_image_url.slice(1));
+
+    // 서브 이미지 삭제
+    const subImages = JSON.parse(sub_images_url);
+    Object.values(subImages).forEach(async (url) => {
+      await deleteFileFromS3(url.slice(1));
+    });
+
+    // 공연, 전시 삭제
+    await showDB.deleteShow({ show_id, user_id });
+
+    res.status(200).json({ ok: true, data: "삭제 성공" });
+  } catch (err) {
+    console.log(err);
     res.status(500).json({ ok: false, message: err.message });
   }
 };
