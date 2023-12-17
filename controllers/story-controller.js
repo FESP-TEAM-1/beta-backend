@@ -11,10 +11,12 @@ exports.getStoryLimit = async (req, res) => {
       data: result,
     });
   } catch (err) {
+    console.error(err);
     res.status(500).json({
       ok: false,
       messge: err,
     });
+    return;
   }
 };
 
@@ -27,10 +29,12 @@ exports.getStoryAll = async (req, res) => {
       data: result,
     });
   } catch (err) {
+    console.error(err);
     res.status(500).json({
       ok: false,
       messge: err,
     });
+    return;
   }
 };
 
@@ -63,6 +67,7 @@ exports.postStoryUpload = [
         ok: false,
         message: err,
       });
+      return;
     }
   },
 ];
