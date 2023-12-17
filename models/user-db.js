@@ -68,9 +68,19 @@ exports.signUp = async (data) => {
   const login_pw = hash;
   try {
     const result = await query(
-      `INSERT INTO user (user_name, user_email, login_id, login_pw, birth_date, gender, phone_number, user_role) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO user (user_name, user_email, login_id, login_pw, birth_date, gender, phone_number, user_role) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [user_name, user_email, login_id, login_pw, birth_date, gender, phone_number, user_role]
     );
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
+// 로그인 시 로그 기록
+exports.insertUserLog = async (user_role, login_id) => {
+  try {
+    const result = await query(`INSERT INTO user_log (user_role, login_id) VALUES (?, ?)`, [user_role, login_id]);
     return result;
   } catch (err) {
     throw err;

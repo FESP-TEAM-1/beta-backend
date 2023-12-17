@@ -1,4 +1,5 @@
 const showDB = require("../models/show-db");
+const userDB = require("../models/user-db");
 const { uploadShowImg } = require("../middleware/imageUpload");
 const util = require("util");
 const db = require("../database/db"); // 데이터베이스 연결 설정
@@ -26,7 +27,9 @@ exports.getFilterConcerts = async (req, res) => {
 
     res.status(200).json({ ok: true, data: result });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ ok: false, messge: err });
+    return;
   }
 };
 
@@ -47,7 +50,9 @@ exports.getFilterExhibitions = async (req, res) => {
 
     res.status(200).json({ ok: true, data: result });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ ok: false, messge: err });
+    return;
   }
 };
 
@@ -56,6 +61,19 @@ exports.getShow = async (req, res) => {
   try {
     const { show_id } = req.params;
     const result = await showDB.getShow({ show_id });
+
+    res.status(200).json({ ok: true, data: result });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ ok: false, messge: err });
+    return;
+  }
+};
+
+exports.getShowReview = async (req, res) => {
+  try {
+    const { show_id } = req.params;
+    const result = await showDB.getShowReview({ show_id });
 
     res.status(200).json({ ok: true, data: result });
   } catch (err) {
@@ -71,7 +89,9 @@ exports.getShowReservation = async (req, res) => {
 
     res.status(200).json({ ok: true, data: result });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ ok: false, messge: err });
+    return;
   }
 };
 
@@ -84,6 +104,7 @@ exports.uploadShow = [
   async (req, res) => {
     try {
       const mainImage = req.files.mainImage;
+      const mainImageColor = req.body.main_image_color;
       const main_image_url = mainImage[0].key.replace("show/", "");
 
       // 트랜잭션 시작
@@ -121,7 +142,7 @@ exports.uploadShow = [
       }
 
       // 공연, 전시 메인 이미지 등록
-      await showDB.insertMainImage({ show_id: insertId, main_image_url: `/show/${main_image_url}` });
+      await showDB.insertMainImage({ show_id: insertId, main_image_url: `/show/${main_image_url}`, image_color: mainImageColor });
 
       // 트랜잭션 커밋
       await commit();
@@ -131,6 +152,87 @@ exports.uploadShow = [
       await rollback(); // 오류 발생 시 트랜잭션 롤백
       console.log(err.message);
       res.status(500).json({ ok: false, message: err.message });
+      return;
     }
   },
 ];
+
+// 공연, 전시 좋아요 추가
+exports.addLike = async (req, res) => {
+  try {
+    const { show_id, login_id } = req.body;
+
+    const userInfo = await userDB.getMember(login_id);
+    const user_id = userInfo[0].id;
+
+    const result = await showDB.addLike({ show_id, user_id });
+
+    res.status(200).json({ ok: true, data: result });
+  } catch (err) {
+    res.status(500).json({ ok: false, message: err.message });
+  }
+};
+
+// 공연, 전시 좋아요 삭제
+exports.deleteLike = async (req, res) => {
+  try {
+    const { show_id, login_id } = req.body;
+
+    const userInfo = await userDB.getMember(login_id);
+    const user_id = userInfo[0].id;
+
+    const result = await showDB.deleteLike({ show_id, user_id });
+
+    res.status(200).json({ ok: true, data: result });
+  } catch (err) {
+    res.status(500).json({ ok: false, message: err.message });
+  }
+};
+
+// 공연, 전시 리뷰 등록
+exports.addReview = async (req, res) => {
+  try {
+    const { show_id, login_id, comment } = req.body;
+
+    const userInfo = await userDB.getMember(login_id);
+    const user_id = userInfo[0].id;
+
+    const result = await showDB.addReview({ show_id, user_id, comment });
+
+    res.status(200).json({ ok: true, data: result });
+  } catch (err) {
+    res.status(500).json({ ok: false, message: err.message });
+  }
+};
+
+// 공연, 전시 리뷰 수정
+exports.modifyReview = async (req, res) => {
+  try {
+    const { review_id, show_id, login_id, comment } = req.body;
+
+    const userInfo = await userDB.getMember(login_id);
+    const user_id = userInfo[0].id;
+
+    const result = await showDB.modifyReview({ review_id, show_id, user_id, comment });
+
+    res.status(200).json({ ok: true, data: result });
+  } catch (err) {
+    res.status(500).json({ ok: false, message: err.message });
+  }
+};
+
+// 공연, 전시 리뷰 삭제
+exports.deleteReview = async (req, res) => {
+  try {
+    const { review_id, show_id, login_id } = req.body;
+
+    const userInfo = await userDB.getMember(login_id);
+    const user_id = userInfo[0].id;
+
+    const result = await showDB.deleteReview({ review_id, show_id, user_id });
+
+    res.status(200).json({ ok: true, data: result });
+  } catch (err) {
+    res.status(500).json({ ok: false, message: err.message });
+  }
+};

@@ -16,9 +16,9 @@ exports.getMemberEmail = async (user_email) => {
   }
 };
 
-exports.insertEmailCode = async (user_email, code) => {
+exports.insertEmailCode = async (user_email, code, message) => {
   try {
-    const result = await query(`INSERT INTO cert (user_email, code) VALUES (?, ?)`, [user_email, code]);
+    const result = await query(`INSERT INTO cert (user_email, code, message) VALUES (?, ?, ?)`, [user_email, code, message]);
     return result;
   } catch (err) {
     throw err;
@@ -27,7 +27,16 @@ exports.insertEmailCode = async (user_email, code) => {
 
 exports.getCertCode = async (user_email) => {
   try {
-    const result = await query(`SELECT code, created_at FROM cert WHERE user_email = ? order by created_at desc limit 1`, [user_email]);
+    const result = await query(`SELECT id, code, created_at FROM cert WHERE user_email = ? order by created_at desc limit 1`, [user_email]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
+exports.updateCertCode = async (id, certified_data) => {
+  try {
+    const result = await query(`UPDATE cert SET certified_data = ? WHERE id = ?`, [certified_data, id]);
     return result;
   } catch (err) {
     throw err;
