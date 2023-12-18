@@ -42,12 +42,47 @@ exports.sendUnivEmail = async (req, res) => {
   const univ_check = true;
 
   try {
+    // const isClear = await axios.post(`https://univcert.com/api/v1/clear`, {
+    //   key: key,
+    // });
+    // console.log("전체 초기화", isClear.data);
+
+    // const status = await axios.post("https://univcert.com/api/v1/status", {
+    //   key: key,
+    //   email: user_email,
+    // });
+    // console.log("인증된 이메일인지 확인", status.data);
+
+    const isEmail = await emailDB.getMemberEmail(user_email);
+    if (isEmail.length > 0) {
+      res.status(400).json({
+        ok: false,
+        message: "이미 가입된 이메일입니다.",
+      });
+      return;
+    } else {
+      const status = await axios.post("https://univcert.com/api/v1/certifiedlist", {
+        key: key,
+      });
+      console.log("인증된 이메일 확인", status.data);
+
+      for (const i of status.data.data) {
+        if (i.email === user_email) {
+          await axios.post(`https://univcert.com/api/v1/clear/${user_email}`, {
+            key: key,
+          });
+          console.log(user_email, "해당 이메일 인증 삭제");
+        }
+      }
+    }
+
     const response = await axios.post("https://univcert.com/api/v1/certify", {
       key: key,
       email: user_email,
       univName: univName,
       univ_check: univ_check,
     });
+    console.log("전송 완료", response.data);
 
     if (response.data.success === false) {
       await emailDB.insertEmailCode(user_email, null, response.data.message);
