@@ -269,7 +269,10 @@ exports.getUserLikeList = async ({ ...args }) => {
   const { user_id } = args;
 
   try {
-    const res = await query(`SELECT * FROM user_likes WHERE user_id = ? ORDER BY created_at DESC`, [user_id]);
+    const res = await query(
+      `SELECT b.* FROM BETA_DATABASE.user_likes AS a LEFT JOIN BETA_DATABASE.showing AS b ON a.show_id = b.id WHERE a.user_id = ? ORDER BY a.created_at DESC`,
+      [user_id]
+    );
 
     return res;
   } catch (err) {
