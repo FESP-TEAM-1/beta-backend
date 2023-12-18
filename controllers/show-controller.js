@@ -256,7 +256,7 @@ exports.deleteReview = async (req, res) => {
 };
 
 // 마이페이지 - 유저 공연, 전시 좋아요 조회
-exports.getUserLike = async (req, res) => {
+exports.getUserLikeList = async (req, res) => {
   try {
     const user_login_id = req.login_id;
 
@@ -264,7 +264,7 @@ exports.getUserLike = async (req, res) => {
     const userInfo = await userDB.getMember(user_login_id);
     const user_id = userInfo[0].id;
 
-    const result = await showDB.getUserLike({ user_id });
+    const result = await showDB.getUserLikeList({ user_id });
 
     res.status(200).json({ ok: true, data: result });
   } catch (err) {
@@ -419,6 +419,23 @@ exports.deleteShow = async (req, res) => {
     await showDB.deleteShow({ show_id, user_id });
 
     res.status(200).json({ ok: true, data: "삭제 성공" });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ ok: false, message: err.message });
+  }
+};
+
+exports.getUserLike = async (req, res) => {
+  try {
+    const { show_id } = req.params;
+    const user_login_id = req.login_id;
+
+    const userInfo = await userDB.getMember(user_login_id);
+    const user_id = userInfo[0].id;
+
+    const result = await showDB.getUserLike({ show_id, user_id });
+
+    res.status(200).json({ ok: true, data: result });
   } catch (err) {
     console.log(err);
     res.status(500).json({ ok: false, message: err.message });

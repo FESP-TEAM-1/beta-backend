@@ -236,7 +236,7 @@ exports.deleteReview = async ({ ...args }) => {
 };
 
 // 마이페이지 - 유저 공연, 전시 좋아요 조회
-exports.getUserLike = async ({ ...args }) => {
+exports.getUserLikeList = async ({ ...args }) => {
   const { user_id } = args;
 
   try {
@@ -346,6 +346,19 @@ exports.deleteShow = async ({ ...args }) => {
     const res = await query(`DELETE FROM showing WHERE id = ? AND user_id = ?`, [show_id, user_id]);
 
     return true;
+  } catch (err) {
+    throw err;
+  }
+};
+
+// 마이페이지 - 유저 공연, 전시 좋아요 조회
+exports.getUserLike = async ({ ...args }) => {
+  const { show_id, user_id } = args;
+
+  try {
+    const res = await query(`SELECT * FROM user_likes WHERE show_id = ? AND user_id = ?`, [show_id, user_id]);
+
+    return res;
   } catch (err) {
     throw err;
   }
