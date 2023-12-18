@@ -70,6 +70,7 @@ exports.getShow = async (req, res) => {
   }
 };
 
+// show_id에 따른 공연, 전시 리뷰 조회
 exports.getShowReview = async (req, res) => {
   try {
     const { show_id } = req.params;
@@ -166,9 +167,11 @@ exports.uploadShow = [
 // 공연, 전시 좋아요 추가
 exports.addLike = async (req, res) => {
   try {
-    const { show_id, login_id } = req.body;
+    const { show_id } = req.body;
+    const user_login_id = req.login_id;
 
-    const userInfo = await userDB.getMember(login_id);
+    // 유저 정보 조회 user_id 가져오기
+    const userInfo = await userDB.getMember(user_login_id);
     const user_id = userInfo[0].id;
 
     const result = await showDB.addLike({ show_id, user_id });
@@ -182,9 +185,11 @@ exports.addLike = async (req, res) => {
 // 공연, 전시 좋아요 삭제
 exports.deleteLike = async (req, res) => {
   try {
-    const { show_id, login_id } = req.body;
+    const { show_id } = req.body;
+    const user_login_id = req.login_id;
 
-    const userInfo = await userDB.getMember(login_id);
+    // 유저 정보 조회 user_id 가져오기
+    const userInfo = await userDB.getMember(user_login_id);
     const user_id = userInfo[0].id;
 
     const result = await showDB.deleteLike({ show_id, user_id });
@@ -198,9 +203,11 @@ exports.deleteLike = async (req, res) => {
 // 공연, 전시 리뷰 등록
 exports.addReview = async (req, res) => {
   try {
-    const { show_id, login_id, comment } = req.body;
+    const { show_id, comment } = req.body;
+    const user_login_id = req.login_id;
 
-    const userInfo = await userDB.getMember(login_id);
+    // 유저 정보 조회 user_id 가져오기
+    const userInfo = await userDB.getMember(user_login_id);
     const user_id = userInfo[0].id;
 
     const result = await showDB.addReview({ show_id, user_id, comment });
@@ -214,9 +221,12 @@ exports.addReview = async (req, res) => {
 // 공연, 전시 리뷰 수정
 exports.updateReview = async (req, res) => {
   try {
-    const { review_id, show_id, login_id, comment } = req.body;
+    const { review_id, show_id, comment } = req.body;
 
-    const userInfo = await userDB.getMember(login_id);
+    const user_login_id = req.login_id;
+
+    // 유저 정보 조회 user_id 가져오기
+    const userInfo = await userDB.getMember(user_login_id);
     const user_id = userInfo[0].id;
 
     const result = await showDB.updateReview({ review_id, show_id, user_id, comment });
@@ -230,9 +240,11 @@ exports.updateReview = async (req, res) => {
 // 공연, 전시 리뷰 삭제
 exports.deleteReview = async (req, res) => {
   try {
-    const { review_id, show_id, login_id } = req.body;
+    const { review_id, show_id } = req.body;
+    const user_login_id = req.login_id;
 
-    const userInfo = await userDB.getMember(login_id);
+    // 유저 정보 조회 user_id 가져오기
+    const userInfo = await userDB.getMember(user_login_id);
     const user_id = userInfo[0].id;
 
     const result = await showDB.deleteReview({ review_id, show_id, user_id });
