@@ -4,7 +4,7 @@ const secret_key = process.env.JWT_SECRET_KEY;
 // access Token 생성
 exports.generateAccessToken = (user) => {
   return jwt.sign(user, secret_key, {
-    expiresIn: "1h",
+    expiresIn: "5h",
   });
 };
 
