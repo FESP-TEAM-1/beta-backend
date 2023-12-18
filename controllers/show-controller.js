@@ -3,6 +3,7 @@ const userDB = require("../models/user-db");
 const { uploadShowImg } = require("../middleware/imageUpload");
 const util = require("util");
 const db = require("../database/db"); // 데이터베이스 연결 설정
+const jwt = require("../utils/jwt-util");
 
 const beginTransaction = util.promisify(db.beginTransaction).bind(db); // 트랜잭션 시작
 const commit = util.promisify(db.commit).bind(db); // 트랜잭션 커밋
