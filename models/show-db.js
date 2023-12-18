@@ -57,7 +57,10 @@ exports.getShowWithUser = async ({ show_id, user_id }) => {
 // show_id에 따른 공연 리뷰 조회
 exports.getShowReview = async ({ show_id }) => {
   try {
-    const result = await query(`SELECT * FROM user_reviews WHERE show_id = ? ORDER BY updated_at DESC`, [show_id]);
+    const result = await query(
+      `SELECT a.*, b.login_id FROM BETA_DATABASE.user_reviews as a left join BETA_DATABASE.user as b on a.user_id = b.id where a.show_id = ? ORDER BY updated_at DESC`,
+      [show_id]
+    );
     return result;
   } catch (err) {
     throw err;
