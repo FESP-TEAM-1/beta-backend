@@ -58,7 +58,7 @@ exports.getShowWithUser = async ({ show_id, user_id }) => {
 exports.getShowReview = async ({ show_id }) => {
   try {
     const result = await query(
-      `SELECT a.*, b.login_id FROM BETA_DATABASE.user_reviews as a left join BETA_DATABASE.user as b on a.user_id = b.id where a.show_id = ? ORDER BY updated_at DESC`,
+      `SELECT a.*, b.login_id FROM BETA_DATABASE.user_reviews as a left join BETA_DATABASE.user as b on a.user_id = b.id where a.show_id = ? ORDER BY created_at DESC`,
       [show_id]
     );
     return result;
