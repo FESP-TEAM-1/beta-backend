@@ -44,6 +44,35 @@ exports.getShow = async ({ show_id }) => {
   }
 };
 
+exports.getShowUser = async ({ user_id, show_id }) => {
+  try {
+    const result = await query(
+      `SELECT
+        s.*,
+        COUNT(ul_all.show_id) AS likes_count,
+        CASE
+          WHEN ul_user.user_id IS NOT NULL THEN TRUE
+          ELSE FALSE
+        END AS user_liked
+      FROM
+        showing AS s
+      LEFT JOIN
+        user_likes AS ul_all ON s.id = ul_all.show_id
+      LEFT JOIN
+        user_likes AS ul_user ON s.id = ul_user.show_id AND ul_user.user_id = ?
+      WHERE
+        s.id = ?
+      GROUP BY
+        s.id;
+      ;`,
+      [user_id, show_id]
+    );
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
 // show_id, user_id에 따른 공연 조회
 exports.getShowWithUser = async ({ show_id, user_id }) => {
   try {

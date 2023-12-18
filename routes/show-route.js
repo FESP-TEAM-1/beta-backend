@@ -11,7 +11,7 @@ router.get("/show/reservation/:show_id", showController.getShowReservation);
 // router.get("/show/upload", showAuthenticate, showController.uploadShow);
 router.get("/show/user/like", userAuthenticate, showController.getUserLikeList);
 router.get("/show/user/review", userAuthenticate, showController.getUserReview);
-router.get("/show/:show_id/user/like", userAuthenticate, showController.getUserLike);
+// router.get("/show/:show_id/user/like", userAuthenticate, showController.getUserLike);
 router.post("/show/upload", showController.uploadShow);
 router.post("/show/like-add", userAuthenticate, showController.addLike);
 router.post("/show/review-add", userAuthenticate, showController.addReview);

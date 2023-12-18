@@ -60,7 +60,15 @@ exports.getFilterExhibitions = async (req, res) => {
 exports.getShow = async (req, res) => {
   try {
     const { show_id } = req.params;
-    const result = await showDB.getShow({ show_id });
+    const accessToken = req.cookies.accessToken;
+    let result;
+    if (!accessToken) {
+      result = await showDB.getShow({ show_id });
+    } else {
+      const decoded = jwt.verifyToken(accessToken);
+      const user_id = decoded.login_id;
+      result = await showDB.getShowUser({ show_id, user_id });
+    }
 
     res.status(200).json({ ok: true, data: result });
   } catch (err) {
