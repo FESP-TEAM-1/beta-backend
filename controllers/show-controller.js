@@ -157,7 +157,10 @@ exports.uploadShow = [
         // method가 agency일 때, 회차 등록
         if (method === "agency") {
           const { date_time } = req.body;
-          await showDB.insertShowTimes({ show_id: insertId, date_time, head_count });
+          const stringToJSON = JSON.parse(date_time);
+          for (const value of Object.values(stringToJSON)) {
+            await showDB.insertShowTimes({ show_id: insertId, date_time: value, head_count });
+          }
         }
       }
 
