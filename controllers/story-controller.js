@@ -152,7 +152,7 @@ exports.putStoryUpdate = [
 // 스토리 삭제
 exports.deleteStoryDelete = async (req, res) => {
   try {
-    const { story_id, story_image_url } = req.body;
+    const { story_id } = req.params;
     const user_login_id = req.login_id;
 
     const userInfo = await userDB.getMember(user_login_id);
@@ -166,6 +166,8 @@ exports.deleteStoryDelete = async (req, res) => {
       });
       return;
     }
+
+    const story_image_url = storyInfo[0].story_image_url;
 
     await storyDB.deleteStoryDelete({ story_id, user_id });
     await deleteFileFromS3(story_image_url.slice(1));
