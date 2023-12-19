@@ -7,13 +7,13 @@ const filterShow = (type, ...arg) => {
   let queryParams = [type];
 
   // start_date 조건 추가
-  if (start_date) {
+  if (end_date) {
     queryValue += " AND start_date <= ?";
     queryParams.push(end_date);
   }
 
   // end_date 조건 추가
-  if (end_date) {
+  if (start_date) {
     queryValue += " AND end_date >= ?";
     queryParams.push(start_date);
   }
