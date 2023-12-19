@@ -86,7 +86,23 @@ exports.getShowWithUser = async ({ show_id, user_id }) => {
 // user_id에 따른 show 조회
 exports.getAllShowUser = async ({ user_id }) => {
   try {
-    const result = await query(`SELECT * FROM showing WHERE user_id = ?`, [user_id]);
+    const result = await query(
+      `SELECT 
+          s.*, 
+          COALESCE(ul.likes_count, 0) AS likes_count,
+          COALESCE(ur.reviews_count, 0) AS reviews_count
+        FROM 
+          showing AS s
+        LEFT JOIN 
+          (SELECT show_id, COUNT(*) AS likes_count FROM user_likes GROUP BY show_id) AS ul 
+          ON s.id = ul.show_id
+        LEFT JOIN 
+          (SELECT show_id, COUNT(*) AS reviews_count FROM user_reviews GROUP BY show_id) AS ur 
+          ON s.id = ur.show_id
+        WHERE 
+          s.user_id = ?`,
+      [user_id]
+    );
     return result;
   } catch (err) {
     throw err;
