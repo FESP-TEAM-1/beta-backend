@@ -99,7 +99,10 @@ exports.getShowReview = async ({ show_id }) => {
 // show_id에 따른 공연, 전시 예약 정보 조회
 exports.getShowReservation = async ({ show_id }) => {
   try {
-    const result = await query(`SELECT * FROM show_reservation_info WHERE show_id = ?`, [show_id]);
+    const result = await query(
+      `SELECT a.*, b.title AS title FROM show_reservation_info AS a LEFT JOIN showing AS b ON a.show_id = b.id WHERE show_id = ?;`,
+      [show_id]
+    );
     return result;
   } catch (err) {
     throw err;
