@@ -67,7 +67,11 @@ exports.getShow = async (req, res) => {
       result = await showDB.getShow({ show_id });
     } else {
       const decoded = jwt.verifyToken(accessToken);
-      const user_id = decoded.login_id;
+      const user_login_id = decoded.login_id;
+
+      const userInfo = await userDB.getMember(user_login_id);
+      const user_id = userInfo[0].id;
+
       result = await showDB.getShowUser({ show_id, user_id });
     }
 
