@@ -65,6 +65,8 @@ exports.getShow = async (req, res) => {
     let result;
     if (!accessToken) {
       result = await showDB.getShow({ show_id });
+      const bufferToString = Buffer.from(result[0].content, "base64").toString("utf8");
+      result[0].content = bufferToString;
     } else {
       const decoded = jwt.verifyToken(accessToken);
       const user_login_id = decoded.login_id;
@@ -73,6 +75,8 @@ exports.getShow = async (req, res) => {
       const user_id = userInfo[0].id;
 
       result = await showDB.getShowUser({ show_id, user_id });
+      const bufferToString = Buffer.from(result[0].content, "base64").toString("utf8");
+      result[0].content = bufferToString;
     }
 
     res.status(200).json({ ok: true, data: result });
@@ -100,6 +104,8 @@ exports.getShowReservation = async (req, res) => {
   try {
     const { show_id } = req.params;
     const result = await showDB.getShowReservation({ show_id });
+    const bufferToString = Buffer.from(result[0].notice, "base64").toString("utf8");
+    result[0].notice = bufferToString;
 
     res.status(200).json({ ok: true, data: result });
   } catch (err) {
@@ -281,6 +287,8 @@ exports.getUserLikeList = async (req, res) => {
     const user_id = userInfo[0].id;
 
     const result = await showDB.getUserLikeList({ user_id });
+    const bufferToString = Buffer.from(result[0].content, "base64").toString("utf8");
+    result[0].content = bufferToString;
 
     res.status(200).json({ ok: true, data: result });
   } catch (err) {
