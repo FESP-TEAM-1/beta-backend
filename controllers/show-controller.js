@@ -107,6 +107,9 @@ exports.getShowReservation = async (req, res) => {
     const bufferToString = Buffer.from(result[0].notice, "base64").toString("utf8");
     result[0].notice = bufferToString;
 
+    const showTimes = await showDB.getShowTimes({ show_id });
+    result[0].date_time = showTimes;
+
     res.status(200).json({ ok: true, data: result });
   } catch (err) {
     console.error(err);

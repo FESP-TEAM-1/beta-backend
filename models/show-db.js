@@ -398,3 +398,13 @@ exports.getUserLike = async ({ ...args }) => {
     throw err;
   }
 };
+
+// 회차 정보 조회
+exports.getShowTimes = async ({ show_id }) => {
+  try {
+    const result = await query(`SELECT * FROM show_times WHERE show_id = ?`, [show_id]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
