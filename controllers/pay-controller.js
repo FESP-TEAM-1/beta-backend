@@ -1,5 +1,6 @@
 const payDB = require("../models/pay-db");
 const showDB = require("../models/show-db");
+const userDB = require("../models/user-db");
 const emailController = require("../controllers/email-controller");
 const { send_main_func } = require("../utils/emailSendUtil");
 const axios = require("axios");
@@ -40,7 +41,6 @@ exports.confirm = async (req, res) => {
       console.log("이메일 전송");
     }
 
-    console.log(show_id, show_times_id, user_id, is_receive_email, orderId, amount);
     // user_reservation 테이블에 예약 정보 저장
     const result = await payDB.insertUserReservation({ show_id, show_times_id, user_id, is_receive_email, orderId, amount });
 
