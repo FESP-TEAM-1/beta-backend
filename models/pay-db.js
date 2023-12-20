@@ -36,3 +36,13 @@ exports.updateShowTimes = async ({ show_times_id }) => {
     return err;
   }
 };
+
+exports.getUserReservation = async ({ show_id, user_id }) => {
+  try {
+    const result = await query(`SELECT * FROM user_reservation WHERE show_id = ? AND user_id = ?`, [show_id, user_id]);
+    return result;
+  } catch (err) {
+    console.error(err);
+    return err;
+  }
+};
