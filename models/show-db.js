@@ -71,7 +71,7 @@ exports.getShowUser = async ({ user_id, show_id }) => {
       GROUP BY
         s.id;
       ;`,
-      [user_id, show_id]
+      [user_id, user_id, show_id]
     );
     return result;
   } catch (err) {
