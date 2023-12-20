@@ -83,6 +83,32 @@ exports.getShowWithUser = async ({ show_id, user_id }) => {
   }
 };
 
+// user_id에 따른 show 조회
+exports.getAllShowUser = async ({ user_id }) => {
+  try {
+    const result = await query(
+      `SELECT 
+          s.*, 
+          COALESCE(ul.likes_count, 0) AS likes_count,
+          COALESCE(ur.reviews_count, 0) AS reviews_count
+        FROM 
+          showing AS s
+        LEFT JOIN 
+          (SELECT show_id, COUNT(*) AS likes_count FROM user_likes GROUP BY show_id) AS ul 
+          ON s.id = ul.show_id
+        LEFT JOIN 
+          (SELECT show_id, COUNT(*) AS reviews_count FROM user_reviews GROUP BY show_id) AS ur 
+          ON s.id = ur.show_id
+        WHERE 
+          s.user_id = ?`,
+      [user_id]
+    );
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
 // show_id에 따른 공연 리뷰 조회
 exports.getShowReview = async ({ show_id }) => {
   try {
@@ -273,7 +299,7 @@ exports.getUserLikeList = async ({ ...args }) => {
 
   try {
     const res = await query(
-      `SELECT b.* FROM BETA_DATABASE.user_likes AS a LEFT JOIN BETA_DATABASE.showing AS b ON a.show_id = b.id WHERE a.user_id = ? ORDER BY a.created_at DESC`,
+      `SELECT b.* FROM user_likes AS a LEFT JOIN showing AS b ON a.show_id = b.id WHERE a.user_id = ? ORDER BY a.created_at DESC`,
       [user_id]
     );
 
@@ -394,6 +420,16 @@ exports.getUserLike = async ({ ...args }) => {
     const res = await query(`SELECT * FROM user_likes WHERE show_id = ? AND user_id = ?`, [show_id, user_id]);
 
     return res;
+  } catch (err) {
+    throw err;
+  }
+};
+
+// 회차 정보 조회
+exports.getShowTimes = async ({ show_id }) => {
+  try {
+    const result = await query(`SELECT * FROM show_times WHERE show_id = ?`, [show_id]);
+    return result;
   } catch (err) {
     throw err;
   }

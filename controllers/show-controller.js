@@ -113,6 +113,9 @@ exports.getShowReservation = async (req, res) => {
       result[0].notice = bufferToString;
     }
 
+    const showTimes = await showDB.getShowTimes({ show_id });
+    result[0].date_time = showTimes;
+
     res.status(200).json({ ok: true, data: result });
   } catch (err) {
     console.error(err);
@@ -213,7 +216,7 @@ exports.addLike = async (req, res) => {
 // 공연, 전시 좋아요 삭제
 exports.deleteLike = async (req, res) => {
   try {
-    const { show_id } = req.body;
+    const { show_id } = req.params;
     const user_login_id = req.login_id;
 
     // 유저 정보 조회 user_id 가져오기
@@ -268,7 +271,7 @@ exports.updateReview = async (req, res) => {
 // 공연, 전시 리뷰 삭제
 exports.deleteReview = async (req, res) => {
   try {
-    const { review_id, show_id } = req.body;
+    const { review_id, show_id } = req.params;
     const user_login_id = req.login_id;
 
     // 유저 정보 조회 user_id 가져오기
@@ -407,7 +410,10 @@ exports.updateShow = [
         // method가 agency일 때, 회차 업데이트
         if (method === "agency") {
           const { date_time } = req.body;
-          await showDB.updateShowTimes({ show_id: req.body.show_id, date_time, head_count });
+          const stringToJSON = JSON.parse(date_time);
+          for (const value of Object.values(stringToJSON)) {
+            await showDB.updateShowTimes({ show_id: req.body.show_id, date_time: value, head_count });
+          }
         }
       }
 
@@ -425,7 +431,7 @@ exports.updateShow = [
 
 exports.deleteShow = async (req, res) => {
   try {
-    const { show_id, main_image_url, sub_images_url } = req.body;
+    const { show_id } = req.params;
     const user_login_id = req.login_id;
 
     const userInfo = await userDB.getMember(user_login_id);
@@ -437,6 +443,9 @@ exports.deleteShow = async (req, res) => {
       res.status(404).json({ ok: false, message: "공연, 전시 정보가 존재하지 않습니다." });
       return;
     }
+
+    const main_image_url = showInfo[0].main_image_url;
+    const sub_images_url = showInfo[0].sub_images_url;
 
     // 메인 이미지 삭제
     await deleteFileFromS3(main_image_url.slice(1));
@@ -466,6 +475,22 @@ exports.getUserLike = async (req, res) => {
     const user_id = userInfo[0].id;
 
     const result = await showDB.getUserLike({ show_id, user_id });
+
+    res.status(200).json({ ok: true, data: result });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ ok: false, message: err.message });
+  }
+};
+
+exports.getAllShowUser = async (req, res) => {
+  try {
+    const user_login_id = req.login_id;
+
+    const userInfo = await userDB.getMember(user_login_id);
+    const user_id = userInfo[0].id;
+
+    const result = await showDB.getAllShowUser({ user_id });
 
     res.status(200).json({ ok: true, data: result });
   } catch (err) {
