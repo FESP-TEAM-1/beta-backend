@@ -68,12 +68,12 @@ exports.confirm = async (req, res) => {
           message: "예약 완료",
         });
       })
-      .catch(function (error) {
+      .catch((error) => {
         // 결제 실패 비즈니스 로직을 구현하세요.
-        console.log(error.response.body);
+        console.log(error);
         res.status(500).json({
           ok: false,
-          message: err,
+          message: error,
         });
       });
   } catch (err) {
