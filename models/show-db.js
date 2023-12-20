@@ -434,3 +434,15 @@ exports.getShowTimes = async ({ show_id }) => {
     throw err;
   }
 };
+
+// 회차에 따른 좌석 정보 조회 (예약 가능한 좌석)
+exports.getEnableTime = async ({ show_times_id }) => {
+  try {
+    const result = await query(`SELECT id, CASE WHEN head_count > 0 THEN true ELSE false END as result FROM show_times WHERE id = ?;`, [
+      show_times_id,
+    ]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};

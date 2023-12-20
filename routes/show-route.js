@@ -7,7 +7,7 @@ router.get("/concert", showController.getFilterConcerts);
 router.get("/exhibition", showController.getFilterExhibitions);
 router.get("/detail/:show_id", showController.getShow);
 router.get("/detail/:show_id/review", showController.getShowReview);
-router.get("/show/reservation/:show_id", showController.getShowReservation);
+router.get("/show/reservation/:show_id", userAuthenticate, showController.getShowReservation);
 // router.get("/show/upload", showAuthenticate, showController.uploadShow);
 router.get("/show/user/like", userAuthenticate, showController.getUserLikeList);
 router.get("/show/user/review", userAuthenticate, showController.getUserReview);
