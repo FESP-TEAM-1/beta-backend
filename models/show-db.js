@@ -53,13 +53,19 @@ exports.getShowUser = async ({ user_id, show_id }) => {
         CASE
           WHEN ul_user.user_id IS NOT NULL THEN TRUE
           ELSE FALSE
-        END AS user_liked
+        END AS user_liked,
+        CASE
+          WHEN ur.user_id IS NOT NULL THEN TRUE
+          ELSE FALSE
+        END AS user_reserved
       FROM
         showing AS s
       LEFT JOIN
         user_likes AS ul_all ON s.id = ul_all.show_id
       LEFT JOIN
         user_likes AS ul_user ON s.id = ul_user.show_id AND ul_user.user_id = ?
+      LEFT JOIN
+        user_reservation AS ur ON s.id = ur.show_id AND ur.user_id = ?
       WHERE
         s.id = ?
       GROUP BY
