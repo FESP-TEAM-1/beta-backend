@@ -467,3 +467,35 @@ exports.getEnableTime = async ({ show_times_id }) => {
     throw err;
   }
 };
+
+exports.getShowReservationInfo = async ({ show_id }) => {
+  try {
+    const result = await query(`select * from show_reservation_info where show_id = ?`, [show_id]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
+// user_id에 따른 show 조회
+exports.getAdminReservationManage = async ({ user_id }) => {
+  try {
+    const result = await query(`SELECT * FROM showing WHERE user_id = ?`, [user_id]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
+// show_id에 따른 show_times, user_reservation 조회
+exports.getAdminReservationManageDetail = async ({ show_id }) => {
+  try {
+    const result = await query(
+      `SELECT a.*, b.date_time, b.head_count FROM user_reservation AS a LEFT JOIN show_times AS b ON a.show_times_id = b.id WHERE a.show_id = ?`,
+      [show_id]
+    );
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};

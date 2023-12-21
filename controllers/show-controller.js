@@ -409,23 +409,35 @@ exports.updateShow = [
       // is_reservation이 1일 때, 공연, 전시 예약 정보 업데이트
       if (req.body.is_reservation === "1") {
         const { method, google_form_url, location, position, price, head_count, notice } = req.body;
-        await showDB.updateShowReservation({
-          show_id: req.body.show_id,
-          method,
-          google_form_url,
-          location,
-          position,
-          price,
-          head_count,
-          notice,
-        });
+        const s_info = await showDB.getShowReservationInfo({ show_id: req.body.show_id });
+        if (s_info.length > 0) {
+          await showDB.updateShowReservation({
+            show_id: req.body.show_id,
+            method,
+            google_form_url,
+            location,
+            position,
+            price,
+            head_count,
+            notice,
+          });
+        } else {
+          await showDB.insertShowReservation({ show_id: req.body.show_id, method, google_form_url, location, position, price, head_count, notice });
+        }
 
         // method가 agency일 때, 회차 업데이트
         if (method === "agency") {
           const { date_time } = req.body;
           const stringToJSON = JSON.parse(date_time);
-          for (const value of Object.values(stringToJSON)) {
-            await showDB.updateShowTimes({ show_id: req.body.show_id, date_time: value, head_count });
+          const s_times = await showDB.getShowTimes({ show_id: req.body.show_id });
+          if (s_times.length === 0) {
+            for (const value of Object.values(stringToJSON)) {
+              await showDB.insertShowTimes({ show_id: req.body.show_id, date_time: value, head_count });
+            }
+          } else {
+            for (const value of Object.values(stringToJSON)) {
+              await showDB.updateShowTimes({ show_id: req.body.show_id, date_time: value, head_count });
+            }
           }
         }
       }
@@ -504,6 +516,34 @@ exports.getAllShowUser = async (req, res) => {
     const user_id = userInfo[0].id;
 
     const result = await showDB.getAllShowUser({ user_id });
+
+    res.status(200).json({ ok: true, data: result });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ ok: false, message: err.message });
+  }
+};
+
+exports.getAdminReservationManage = async (req, res) => {
+  try {
+    const user_login_id = req.login_id;
+
+    const userInfo = await userDB.getMember(user_login_id);
+    const user_id = userInfo[0].id;
+
+    const result = await showDB.getAdminReservationManage({ user_id });
+
+    res.status(200).json({ ok: true, data: result });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ ok: false, message: err.message });
+  }
+};
+
+exports.getAdminReservationManageDetail = async (req, res) => {
+  try {
+    const { show_id } = req.params;
+    const result = await showDB.getAdminReservationManageDetail({ show_id });
 
     res.status(200).json({ ok: true, data: result });
   } catch (err) {
