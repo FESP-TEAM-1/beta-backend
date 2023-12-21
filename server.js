@@ -1,5 +1,7 @@
 require("dotenv").config();
 const express = require("express");
+const session = require("express-session");
+const MemoryStore = require("memorystore")(session);
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const fs = require("fs");
@@ -14,6 +16,19 @@ app.use(
     credentials: true,
   })
 );
+
+const maxAge = process.env.SESSION_EXPIRE_TIME; // 7일
+const sessionObj = {
+  secret: process.env.SESSION_SECRET_KEY,
+  httpOnly: true,
+  resave: false,
+  saveUninitialized: true,
+  store: new MemoryStore({ checkPeriod: maxAge }),
+  cookie: {
+    maxAge,
+  },
+};
+app.use(session(sessionObj));
 
 const routesPath = path.join(__dirname, "/routes"); // routes 파일들이 있는 디렉토리 경로
 
