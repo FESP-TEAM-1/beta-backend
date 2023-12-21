@@ -1,6 +1,6 @@
 const jwt = require("../utils/jwt-util");
 
-const showAuthenticate = (req, res, next) => {
+const adminAuthenticate = (req, res, next) => {
   if (req.cookies.accessToken) {
     const decoded = jwt.verifyToken(req.cookies.accessToken);
     if (decoded.user_role === "admin") {
@@ -54,4 +54,4 @@ const supervisorAuthenticate = (req, res, next) => {
   }
 };
 
-module.exports = { showAuthenticate, userAuthenticate, supervisorAuthenticate };
+module.exports = { adminAuthenticate, userAuthenticate, supervisorAuthenticate };
