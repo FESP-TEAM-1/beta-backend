@@ -1,6 +1,8 @@
 const showDB = require("../models/show-db");
 const userDB = require("../models/user-db");
 const { uploadShowImg } = require("../middleware/imageUpload");
+const { deleteFileFromS3 } = require("../middleware/imageDelete");
+
 const util = require("util");
 const db = require("../database/db"); // 데이터베이스 연결 설정
 const jwt = require("../utils/jwt-util");
@@ -132,6 +134,12 @@ exports.uploadShow = [
   ]),
   async (req, res) => {
     try {
+      const user_login_id = req.login_id;
+
+      // 유저 정보 조회 user_id 가져오기
+      const userInfo = await userDB.getMember(user_login_id);
+      const user_id = userInfo[0].id;
+
       const mainImage = req.files.mainImage;
       const mainImageColor = req.body.main_image_color;
       const main_image_url = mainImage[0].key.replace("show/", "");
@@ -162,7 +170,12 @@ exports.uploadShow = [
       }
 
       // 공연, 전시 등록
-      const insertId = await showDB.insertShow({ ...req.body, main_image_url: `/show/${main_image_url}`, sub_images_url: sub_images_url_string });
+      const insertId = await showDB.insertShow({
+        ...req.body,
+        user_id,
+        main_image_url: `/show/${main_image_url}`,
+        sub_images_url: sub_images_url_string,
+      });
 
       // is_reservation이 1일 때, 공연, 전시 예약 정보 등록
       if (req.body.is_reservation === "1") {
