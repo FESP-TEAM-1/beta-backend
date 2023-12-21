@@ -105,3 +105,13 @@ exports.updateUser = async (data) => {
     throw err;
   }
 };
+
+// 아이디 중복 확인
+exports.getConfirmId = async (login_id) => {
+  try {
+    const result = await query(`SELECT login_id FROM user WHERE login_id = ?`, [login_id]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};

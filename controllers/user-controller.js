@@ -48,10 +48,19 @@ exports.getAllMember = async (req, res) => {
 
 // 유저 조회 (아이디로 조회)
 exports.getMember = async (req, res) => {
-  const { login_id } = req.params;
+  // const { login_id } = req.params;
+  const user_login_id = req.login_id;
+
+  if (user_login_id !== req.session.login_id) {
+    res.status(401).json({
+      ok: false,
+      message: "권한이 없습니다.",
+    });
+    return;
+  }
 
   try {
-    const result = await userDB.getMember(login_id);
+    const result = await userDB.getMember(user_login_id);
     res.status(200).json({
       ok: true,
       data: result,
@@ -153,6 +162,11 @@ exports.login = async (req, res) => {
       secure: true,
     });
 
+    // 세션 저장
+    req.session.login_id = user[0].login_id;
+    req.session.user_name = user[0].user_name;
+    req.session.user_role = user[0].user_role;
+
     await userDB.insertUserLog(user[0].user_role, user[0].login_id);
 
     res.status(200).json({
@@ -233,11 +247,23 @@ exports.refreshToken = async (req, res) => {
 
 // 로그아웃
 exports.logout = async (req, res) => {
-  res.clearCookie("accessToken");
-  res.clearCookie("refreshToken");
-  res.status(200).json({
-    ok: true,
-    data: "Logout successful",
+  req.session.destroy((err) => {
+    if (err) {
+      // 세션 파괴 중 에러 처리
+      return res.status(500).json({
+        ok: false,
+        message: "Logout failed",
+      });
+    }
+
+    // 세션 파괴 성공 후 쿠키 클리어 및 응답
+    res.clearCookie("connect.sid");
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
+    res.status(200).json({
+      ok: true,
+      data: "Logout successful",
+    });
   });
 };
 
@@ -281,6 +307,15 @@ exports.updateUser = async (req, res) => {
   try {
     const { user_name, user_email, login_pw, birth_date, gender, phone_number } = req.body;
     const user_login_id = req.login_id;
+    const session_login_id = req.session.login_id;
+
+    if (session_login_id !== user_login_id) {
+      res.status(401).json({
+        ok: false,
+        message: "권한이 없습니다.",
+      });
+      return;
+    }
 
     // 유저 정보 조회 user_id 가져오기
     const userInfo = await userDB.getMember(user_login_id);
@@ -301,5 +336,29 @@ exports.updateUser = async (req, res) => {
       message: "회원정보 수정 실패...",
     });
     return;
+  }
+};
+
+exports.getConfirmId = async (req, res) => {
+  try {
+    const { login_id } = req.params;
+    const result = await userDB.getConfirmId(login_id);
+    if (result.length === 0) {
+      res.status(200).json({
+        ok: true,
+        data: "사용 가능한 아이디입니다.",
+      });
+    } else {
+      res.status(200).json({
+        ok: false,
+        data: "이미 사용중인 아이디입니다.",
+      });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      ok: false,
+      message: err,
+    });
   }
 };

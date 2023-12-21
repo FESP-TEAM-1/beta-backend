@@ -1,12 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/user-controller");
-const { userAuthenticate } = require("../middleware/auth-middleware");
+const { userAuthenticate, supervisorAuthenticate } = require("../middleware/auth-middleware");
 
-router.get("/getAllMember", userController.getAllMember);
-router.get("/getMember/:login_id", userController.getMember);
-router.get("/getUsers", userController.getUsers);
-router.get("/getAdmins", userController.getAdmins);
+router.get("/getAllMember", supervisorAuthenticate, userController.getAllMember);
+router.get("/getMember/:login_id", userAuthenticate, userController.getMember);
+router.get("/sign/getMember/:login_id", userController.getConfirmId);
+router.get("/getUsers", supervisorAuthenticate, userController.getUsers);
+router.get("/getAdmins", supervisorAuthenticate, userController.getAdmins);
 router.get("/verifyToken", userController.verifyToken);
 router.get("/refreshToken", userController.refreshToken);
 router.post("/signup", userController.signup);
