@@ -322,7 +322,20 @@ exports.getUserReview = async ({ ...args }) => {
   const { user_id } = args;
 
   try {
-    const res = await query(`SELECT * FROM user_reviews WHERE user_id = ? ORDER BY updated_at DESC`, [user_id]);
+    const res = await query(
+      `SELECT 
+          r.*, 
+          s.title, 
+          u.login_id 
+        FROM 
+          BETA_DATABASE.user_reviews as r
+        left join  
+          BETA_DATABASE.showing as s on r.show_id = s.id
+        left join
+          BETA_DATABASE.user as u on r.user_id = u.id
+        WHERE r.user_id = ? ORDER BY created_at DESC`,
+      [user_id]
+    );
 
     return res;
   } catch (err) {
