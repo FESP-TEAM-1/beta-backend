@@ -490,11 +490,16 @@ exports.getAdminReservationManage = async ({ user_id }) => {
 // show_id에 따른 show_times, user_reservation 조회
 exports.getAdminReservationManageDetail = async ({ show_id }) => {
   try {
-    const result = await query(
-      `SELECT a.*, b.date_time, b.head_count FROM user_reservation AS a LEFT JOIN show_times AS b ON a.show_times_id = b.id WHERE a.show_id = ?`,
-      [show_id]
-    );
-    return result;
+    // show_reservation_info에서 head_count 가져오기
+    const result = await query(`select head_count from show_reservation_info where show_id = ?`, [show_id]);
+
+    // user_reservation 가져오기
+    const result2 = await query(`select * from user_reservation where show_id = ?`, [show_id]);
+
+    // show_times 가져오기
+    const result3 = await query(`select * from show_times where show_id = ?`, [show_id]);
+
+    return { result, result2, result3 };
   } catch (err) {
     throw err;
   }

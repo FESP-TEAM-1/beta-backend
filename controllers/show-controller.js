@@ -543,9 +543,9 @@ exports.getAdminReservationManage = async (req, res) => {
 exports.getAdminReservationManageDetail = async (req, res) => {
   try {
     const { show_id } = req.params;
-    const result = await showDB.getAdminReservationManageDetail({ show_id });
+    const { result, result2, result3 } = await showDB.getAdminReservationManageDetail({ show_id });
 
-    res.status(200).json({ ok: true, data: result });
+    res.status(200).json({ ok: true, data: { show_reservation_info: result, user_reservation: result2, show_times: result3 } });
   } catch (err) {
     console.log(err);
     res.status(500).json({ ok: false, message: err.message });
