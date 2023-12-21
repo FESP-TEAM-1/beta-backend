@@ -17,7 +17,7 @@ app.use(
   })
 );
 
-const maxAge = process.env.SESSION_EXPIRE_TIME; // 7일
+const maxAge = 604800000; // 7일
 const sessionObj = {
   secret: process.env.SESSION_SECRET_KEY,
   httpOnly: true,
