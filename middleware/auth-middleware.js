@@ -33,4 +33,25 @@ const userAuthenticate = (req, res, next) => {
   }
 };
 
-module.exports = { showAuthenticate, userAuthenticate };
+const supervisorAuthenticate = (req, res, next) => {
+  const accessToken = req.cookies.accessToken;
+
+  if (accessToken) {
+    const verifyToken = jwt.verifyToken(accessToken);
+    if (verifyToken) {
+      if (verifyToken.user_role === "supervisor") {
+        req.login_id = verifyToken.login_id;
+        req.user_role = verifyToken.user_role;
+        next();
+      } else {
+        res.status(401).json({ ok: false, message: "접근할 수 없습니다." });
+      }
+    } else {
+      res.status(401).json({ ok: false, message: "접근할 수 없습니다." });
+    }
+  } else {
+    res.status(401).json({ ok: false, message: "접근할 수 없습니다." });
+  }
+};
+
+module.exports = { showAuthenticate, userAuthenticate, supervisorAuthenticate };
