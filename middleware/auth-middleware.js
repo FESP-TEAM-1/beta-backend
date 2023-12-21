@@ -4,6 +4,8 @@ const showAuthenticate = (req, res, next) => {
   if (req.cookies.accessToken) {
     const decoded = jwt.verifyToken(req.cookies.accessToken);
     if (decoded.user_role === "admin") {
+      req.login_id = decoded.login_id;
+      req.user_role = decoded.user_role;
       next();
     } else {
       res.status(401).json({ ok: false, message: "관리자로 로그인 해주시기 바랍니다." });

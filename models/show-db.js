@@ -164,7 +164,7 @@ exports.insertShow = async ({ ...args }) => {
 
   try {
     const res = await query(
-      `INSERT INTO showing (user_id, show_type, show_sub_type, title, start_date, end_date, location, location_detail, position, main_image_url, main_image_color, sub_images_url, univ, department, tags, content, is_reservation) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO showing (user_id, show_type, show_sub_type, title, start_date, end_date, location, location_detail, position, main_image_url, main_image_color, sub_images_url, univ, department, tags, content, is_reservation) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         user_id,
         show_type,
