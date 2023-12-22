@@ -301,6 +301,18 @@ exports.deleteReview = async ({ ...args }) => {
   }
 };
 
+exports.deleteAdminReview = async ({ ...args }) => {
+  const { review_id, show_id } = args;
+
+  try {
+    const res = await query(`DELETE FROM user_reviews WHERE id = ? AND show_id = ?`, [review_id, show_id]);
+
+    return true;
+  } catch (err) {
+    throw err;
+  }
+};
+
 // 마이페이지 - 유저 공연, 전시 좋아요 조회
 exports.getUserLikeList = async ({ ...args }) => {
   const { user_id } = args;

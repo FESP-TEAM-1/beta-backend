@@ -21,6 +21,7 @@ router.patch("/show/review-update", userAuthenticate, showController.updateRevie
 router.put("/show/update", adminAuthenticate, showController.updateShow);
 router.delete("/show/like-delete/:show_id", userAuthenticate, showController.deleteLike);
 router.delete("/show/review-delete/:review_id/:show_id", userAuthenticate, showController.deleteReview);
+router.delete("/show/review/admin/delete/:review_id/:show_id", adminAuthenticate, showController.deleteAdminReview);
 router.delete("/show/delete/:show_id", adminAuthenticate, showController.deleteShow);
 
 module.exports = router;
