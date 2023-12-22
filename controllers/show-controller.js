@@ -67,7 +67,7 @@ exports.getShow = async (req, res) => {
     let result;
     if (!accessToken) {
       result = await showDB.getShow({ show_id });
-      if (result[0].content !== null) {
+      if (result.length > 0 && result[0].content !== null) {
         const bufferToString = Buffer.from(result[0].content, "base64").toString("utf8");
         result[0].content = bufferToString;
       }
@@ -79,7 +79,7 @@ exports.getShow = async (req, res) => {
       const user_id = userInfo[0].id;
 
       result = await showDB.getShowUser({ show_id, user_id });
-      if (result[0].content !== null) {
+      if (result.length > 0 && result[0].content !== null) {
         const bufferToString = Buffer.from(result[0].content, "base64").toString("utf8");
         result[0].content = bufferToString;
       }
@@ -110,7 +110,7 @@ exports.getShowReservation = async (req, res) => {
   try {
     const { show_id } = req.params;
     const result = await showDB.getShowReservation({ show_id });
-    if (result[0].notice !== null) {
+    if (result.length > 0 && result[0].notice !== null) {
       const bufferToString = Buffer.from(result[0].notice, "base64").toString("utf8");
       result[0].notice = bufferToString;
     }
@@ -307,9 +307,8 @@ exports.getUserLikeList = async (req, res) => {
     // 유저 정보 조회 user_id 가져오기
     const userInfo = await userDB.getMember(user_login_id);
     const user_id = userInfo[0].id;
-
     const result = await showDB.getUserLikeList({ user_id });
-    if (result[0].content !== null) {
+    if (result.length > 0 && result[0].content !== null) {
       const bufferToString = Buffer.from(result[0].content, "base64").toString("utf8");
       result[0].content = bufferToString;
     }
@@ -546,6 +545,17 @@ exports.getAdminReservationManageDetail = async (req, res) => {
     const { result, result2, result3 } = await showDB.getAdminReservationManageDetail({ show_id });
 
     res.status(200).json({ ok: true, data: { show_reservation_info: result, user_reservation: result2, show_times: result3 } });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ ok: false, message: err.message });
+  }
+};
+
+exports.deleteAdminReview = async (req, res) => {
+  try {
+    const { review_id, show_id } = req.params;
+    const result = await showDB.deleteAdminReview({ review_id, show_id });
+    res.status(200).json({ ok: true, data: true });
   } catch (err) {
     console.log(err);
     res.status(500).json({ ok: false, message: err.message });
