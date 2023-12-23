@@ -45,7 +45,7 @@ exports.getStoryUser = async (req, res) => {
     const userInfo = await userDB.getMember(user_login_id);
     const user_id = userInfo[0].id;
 
-    const result = await storyDB.getStoryUser(user_id);
+    const result = await storyDB.getStoryUser({ user_id });
     res.status(200).json({
       ok: true,
       data: result,
@@ -152,13 +152,21 @@ exports.putStoryUpdate = [
 // 스토리 삭제
 exports.deleteStoryDelete = async (req, res) => {
   try {
-    const { story_id } = req.params;
+    const { story_id, login_id } = req.params;
     const user_login_id = req.login_id;
 
     const userInfo = await userDB.getMember(user_login_id);
     const user_id = userInfo[0].id;
 
-    const storyInfo = await storyDB.getStory(story_id, user_id);
+    if (user_login_id !== login_id) {
+      res.status(401).json({
+        ok: false,
+        message: "삭제 권한이 없습니다.",
+      });
+      return;
+    }
+
+    const storyInfo = await storyDB.getStory({ story_id, user_id });
     if (storyInfo.length === 0) {
       res.status(404).json({
         ok: false,

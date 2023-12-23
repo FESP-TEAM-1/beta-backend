@@ -39,7 +39,11 @@ exports.getStory = async ({ story_id, user_id }) => {
 // user_id로 스토리 조회
 exports.getStoryUser = async ({ user_id }) => {
   try {
-    const result = await query(`SELECT * FROM story WHERE user_id = ? ORDER BY updated_at DESC`, [user_id]);
+    const result = await query(
+      `SELECT a.id, a.story_image_url, a.story_color, a.tags, a.created_at, a.updated_at, b.login_id FROM story as a 
+      inner join user as b on a.user_id = b.id where a.user_id = ? order by created_at desc`,
+      [user_id]
+    );
     return result;
   } catch (err) {
     throw err;
