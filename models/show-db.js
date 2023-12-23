@@ -516,3 +516,23 @@ exports.getAdminReservationManageDetail = async ({ show_id }) => {
     throw err;
   }
 };
+
+// user_id에 따른 user_reservation 조회
+exports.getUserReservation = async ({ user_id }) => {
+  try {
+    const result = await query(
+      `
+      SELECT ur.*, s.title, s.location, s.location_detail, s.main_image_url, t.date_time 
+      FROM BETA_DATABASE.user_reservation AS ur
+      LEFT JOIN BETA_DATABASE.showing AS s
+      ON ur.show_id = s.id
+      LEFT JOIN BETA_DATABASE.show_times AS t
+      ON ur.show_times_id = t.id
+      WHERE ur.user_id = ?;`,
+      [user_id]
+    );
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};

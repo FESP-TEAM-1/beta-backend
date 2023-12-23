@@ -11,6 +11,7 @@ router.get("/show/reservation/:show_id", userAuthenticate, showController.getSho
 router.get("/show/user/like", userAuthenticate, showController.getUserLikeList);
 router.get("/show/user/review", userAuthenticate, showController.getUserReview);
 router.get("/show/user", userAuthenticate, showController.getAllShowUser);
+router.get("/show/user/reservation", userAuthenticate, showController.getUserReservation);
 router.get("/show/admin/reservation/manage", adminAuthenticate, showController.getAdminReservationManage);
 router.get("/show/admin/reservation/manage/:show_id", adminAuthenticate, showController.getAdminReservationManageDetail);
 // router.get("/show/:show_id/user/like", userAuthenticate, showController.getUserLike);
