@@ -581,3 +581,19 @@ exports.deleteAdminReview = async (req, res) => {
     res.status(500).json({ ok: false, message: err.message });
   }
 };
+
+exports.getUserReservation = async (req, res) => {
+  try {
+    const user_login_id = req.login_id;
+
+    const userInfo = await userDB.getMember(user_login_id);
+    const user_id = userInfo[0].id;
+
+    const result = await showDB.getUserReservation({ user_id });
+
+    res.status(200).json({ ok: true, data: result });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ ok: false, message: err.message });
+  }
+};
