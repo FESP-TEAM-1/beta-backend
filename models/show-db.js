@@ -132,7 +132,7 @@ exports.getShowReview = async ({ show_id }) => {
 exports.getShowReservation = async ({ show_id }) => {
   try {
     const result = await query(
-      `SELECT a.*, b.title AS title FROM show_reservation_info AS a LEFT JOIN showing AS b ON a.show_id = b.id WHERE show_id = ?;`,
+      `SELECT a.*, b.title AS title, b.location_detail AS location_detail FROM show_reservation_info AS a LEFT JOIN showing AS b ON a.show_id = b.id WHERE show_id = ?;`,
       [show_id]
     );
     return result;
@@ -471,7 +471,7 @@ exports.getShowTimes = async ({ show_id }) => {
 // 회차에 따른 좌석 정보 조회 (예약 가능한 좌석)
 exports.getEnableTime = async ({ show_times_id }) => {
   try {
-    const result = await query(`SELECT id, CASE WHEN head_count > 0 THEN true ELSE false END as result FROM show_times WHERE id = ?;`, [
+    const result = await query(`SELECT id, date_time, CASE WHEN head_count > 0 THEN true ELSE false END as result FROM show_times WHERE id = ?;`, [
       show_times_id,
     ]);
     return result;
