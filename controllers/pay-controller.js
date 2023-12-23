@@ -1,8 +1,7 @@
 const payDB = require("../models/pay-db");
 const showDB = require("../models/show-db");
 const userDB = require("../models/user-db");
-const emailController = require("../controllers/email-controller");
-const { send_main_func } = require("../utils/emailSendUtil");
+const { send_main_func } = require("../utils/reservationEmailSendUtil");
 const axios = require("axios");
 
 const db = require("../database/db"); // 데이터베이스 연결 설정
@@ -47,7 +46,25 @@ exports.confirm = async (req, res) => {
 
     if (is_receive_email === 1) {
       // 이메일 전송
-      console.log("이메일 전송");
+      const showInfo = await showDB.getShowReservation({ show_id });
+
+      if (showInfo.length > 0 && showInfo[0].notice !== null) {
+        const bufferToString = Buffer.from(showInfo[0].notice, "base64").toString("utf8");
+        const utf8String = Buffer.from(bufferToString, "base64").toString("utf8");
+        showInfo[0].notice = utf8String;
+      }
+
+      const item = {
+        title: showInfo[0].title,
+        location: showInfo[0].location + " " + showInfo[0].location_detail,
+        price: showInfo[0].price,
+        notice: showInfo[0].notice,
+        date_time: getEnableTime[0].date_time,
+        name: userInfo[0].user_name,
+        phone_number: userInfo[0].phone_number,
+        email: userInfo[0].user_email,
+      };
+      await send_main_func({ to: userInfo[0].user_email, item });
     }
 
     // user_reservation 테이블에 예약 정보 저장
