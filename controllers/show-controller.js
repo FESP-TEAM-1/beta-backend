@@ -407,7 +407,7 @@ exports.updateShow = [
           const formImageName = formSubImages[key];
           const newFile = subImages.find((file) => file.originalname === formImageName);
 
-          return newFile ? `/${newFile.key}` : formImageName;
+          return newFile ? `/${newFile.key}` : `/show/${formImageName}`;
         });
 
         const sub_images_url = sub_images_list.reduce((acc, current, index) => {
@@ -447,15 +447,35 @@ exports.updateShow = [
         // method가 agency일 때, 회차 업데이트
         if (method === "agency") {
           const { date_time } = req.body;
-          const stringToJSON = JSON.parse(date_time);
-          const s_times = await showDB.getShowTimes({ show_id: req.body.show_id });
-          if (s_times.length === 0) {
-            for (const value of Object.values(stringToJSON)) {
+          const reqTimes = JSON.parse(date_time);
+          const dbTimes = await showDB.getShowTimes({ show_id: req.body.show_id });
+
+          // 기존 회차 중 변경된 회차 삭제
+          const transformDbTimes = dbTimes.map((item) => {
+            return { [item.id]: item.date_time };
+          });
+          const s_times_json = Object.assign({}, ...transformDbTimes);
+          const deleteTimes = Object.keys(s_times_json).filter((item) => !Object.values(reqTimes).includes(s_times_json[item]));
+          if (deleteTimes.length > 0) {
+            for (const show_times_id of deleteTimes) {
+              await showDB.deleteShowTimes({ show_id: req.body.show_id, show_times_id });
+            }
+          }
+
+          // 기존 회차 중 변경된 회차 업데이트
+          if (dbTimes.length === 0) {
+            // 기존 회차가 없을 때, 새로운 회차 추가
+            for (const value of Object.values(reqTimes)) {
               await showDB.insertShowTimes({ show_id: req.body.show_id, date_time: value, head_count });
             }
           } else {
-            for (const [key, value] of Object.entries(stringToJSON)) {
-              await showDB.updateShowTimes({ show_id: req.body.show_id, date_time: value, show_times_id: key, head_count });
+            // 기존 회차가 있을 때, 새로운 회차 추가 및 기존 회차 업데이트
+            for (const [key, value] of Object.entries(reqTimes)) {
+              if (key.includes("new")) {
+                await showDB.insertShowTimes({ show_id: req.body.show_id, date_time: value, head_count });
+              } else {
+                await showDB.updateShowTimes({ show_id: req.body.show_id, date_time: value, show_times_id: key, head_count });
+              }
             }
           }
         }

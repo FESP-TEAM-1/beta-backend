@@ -541,3 +541,15 @@ exports.getUserReservation = async ({ user_id }) => {
     throw err;
   }
 };
+
+exports.deleteShowTimes = async ({ ...args }) => {
+  const { show_id, show_times_id } = args;
+
+  try {
+    const res = await query(`DELETE FROM show_times WHERE show_id = ? AND id = ?`, [show_id, show_times_id]);
+
+    return true;
+  } catch (err) {
+    throw err;
+  }
+};
