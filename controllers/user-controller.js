@@ -48,16 +48,16 @@ exports.getAllMember = async (req, res) => {
 
 // 유저 조회 (아이디로 조회)
 exports.getMember = async (req, res) => {
-  // const { login_id } = req.params;
   const user_login_id = req.login_id;
 
-  if (user_login_id !== req.session.login_id) {
-    res.status(401).json({
-      ok: false,
-      message: "권한이 없습니다.",
-    });
-    return;
-  }
+  // 서버 재시작 시 세션 초기화 됨...
+  // if (user_login_id !== req.session.login_id) {
+  //   res.status(401).json({
+  //     ok: false,
+  //     message: "권한이 없습니다. 다시 로그인 해주시기 바랍니다.",
+  //   });
+  //   return;
+  // }
 
   try {
     const result = await userDB.getMember(user_login_id);
