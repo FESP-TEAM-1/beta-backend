@@ -454,8 +454,8 @@ exports.updateShow = [
               await showDB.insertShowTimes({ show_id: req.body.show_id, date_time: value, head_count });
             }
           } else {
-            for (const value of Object.values(stringToJSON)) {
-              await showDB.updateShowTimes({ show_id: req.body.show_id, date_time: value, head_count });
+            for (const [key, value] of Object.entries(stringToJSON)) {
+              await showDB.updateShowTimes({ show_id: req.body.show_id, date_time: value, show_times_id: key, head_count });
             }
           }
         }

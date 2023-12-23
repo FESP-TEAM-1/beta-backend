@@ -422,10 +422,15 @@ exports.updateShowReservation = async ({ ...args }) => {
 };
 
 exports.updateShowTimes = async ({ ...args }) => {
-  const { show_id, date_time, head_count } = args;
+  const { show_id, date_time, show_times_id, head_count } = args;
 
   try {
-    const res = await query(`UPDATE show_times SET head_count = ?, date_time = ? WHERE show_id = ?`, [head_count, date_time, show_id]);
+    const res = await query(`UPDATE show_times SET head_count = ?, date_time = ? WHERE show_id = ? AND id = ?`, [
+      head_count,
+      date_time,
+      show_id,
+      show_times_id,
+    ]);
 
     return true;
   } catch (err) {
