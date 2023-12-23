@@ -527,8 +527,10 @@ exports.getUserReservation = async ({ user_id }) => {
   try {
     const result = await query(
       `
-      SELECT ur.*, s.title, s.location, s.location_detail, s.main_image_url, t.date_time 
+      SELECT ur.*, sr.notice, s.title, s.location, s.location_detail, s.main_image_url, s.position, t.date_time 
       FROM BETA_DATABASE.user_reservation AS ur
+      LEFT JOIN BETA_DATABASE.show_reservation_info AS sr
+      ON ur.show_id = sr.show_id
       LEFT JOIN BETA_DATABASE.showing AS s
       ON ur.show_id = s.id
       LEFT JOIN BETA_DATABASE.show_times AS t
