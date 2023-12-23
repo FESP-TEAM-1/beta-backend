@@ -416,6 +416,19 @@ exports.updateShow = [
         }, {});
 
         sub_images_url_string = JSON.stringify(sub_images_url);
+      } else {
+        const formSubImages = JSON.parse(req.body.sub_images_url);
+        const sub_images_list = Object.keys(formSubImages).map((key) => {
+          const formImageName = formSubImages[key];
+          return `/show/${formImageName}`;
+        });
+
+        const sub_images_url = sub_images_list.reduce((acc, current, index) => {
+          acc[index + 1] = current;
+          return acc;
+        }, {});
+
+        sub_images_url_string = JSON.stringify(sub_images_url);
       }
 
       // 공연, 전시 업데이트
