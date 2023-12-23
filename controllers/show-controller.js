@@ -368,34 +368,54 @@ exports.updateShow = [
         }
       }
 
-      // 서브 이미지 업데이트
-      let sub_images_url_string = showInfo[0].sub_images_url;
+      // // 서브 이미지 업데이트
+      // let sub_images_url_string = showInfo[0].sub_images_url;
+      // if (req.files.subImages) {
+      //   const subImages = req.files.subImages;
+      //   const clientSubImages = JSON.parse(req.body.sub_images_url);
+
+      //   // 기존 서브 이미지 목록
+      //   const existingSubImages = JSON.parse(showInfo[0].sub_images_url);
+      //   const sub_images_list = Object.keys(clientSubImages).map((key) => {
+      //     const originalName = clientSubImages[key];
+      //     const uploadedFile = subImages.find((file) => file.originalname === originalName);
+      //     return uploadedFile ? uploadedFile.key.replace("show/", "") : existingSubImages[key];
+      //   });
+
+      //   // 서버에 저장된 이미지 경로를 DB에 저장하기 위해 객체로 변환
+      //   const sub_images_url = sub_images_list.reduce((acc, current, index) => {
+      //     acc[index + 1] = `/show/${current}`;
+      //     return acc;
+      //   }, {});
+
+      //   sub_images_url_string = JSON.stringify(sub_images_url);
+
+      //   // 기존 서브 이미지 중 변경된 이미지 삭제
+      //   Object.values(existingSubImages).forEach(async (url, index) => {
+      //     if (!sub_images_list.includes(url.replace("/show/", ""))) {
+      //       await deleteFileFromS3(url.slice(1));
+      //     }
+      //   });
+      // }
+
+      let sub_images_url_string = req.body.sub_images_url;
       if (req.files.subImages) {
         const subImages = req.files.subImages;
-        const clientSubImages = JSON.parse(req.body.sub_images_url);
+        const formSubImages = JSON.parse(req.body.sub_images_url);
 
-        // 기존 서브 이미지 목록
-        const existingSubImages = JSON.parse(showInfo[0].sub_images_url);
-        const sub_images_list = Object.keys(clientSubImages).map((key) => {
-          const originalName = clientSubImages[key];
-          const uploadedFile = subImages.find((file) => file.originalname === originalName);
-          return uploadedFile ? uploadedFile.key.replace("show/", "") : existingSubImages[key];
+        const sub_images_list = Object.keys(formSubImages).map((key) => {
+          const formImageName = formSubImages[key];
+          const newFile = subImages.find((file) => file.originalname === formImageName);
+
+          return newFile ? `/${newFile.key}` : formImageName;
         });
 
-        // 서버에 저장된 이미지 경로를 DB에 저장하기 위해 객체로 변환
         const sub_images_url = sub_images_list.reduce((acc, current, index) => {
-          acc[index + 1] = `/show/${current}`;
+          acc[index + 1] = current;
           return acc;
         }, {});
 
         sub_images_url_string = JSON.stringify(sub_images_url);
-
-        // 기존 서브 이미지 중 변경된 이미지 삭제
-        Object.values(existingSubImages).forEach(async (url, index) => {
-          if (!sub_images_list.includes(url.replace("/show/", ""))) {
-            await deleteFileFromS3(url.slice(1));
-          }
-        });
       }
 
       // 공연, 전시 업데이트
