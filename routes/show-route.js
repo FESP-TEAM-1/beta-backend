@@ -22,6 +22,7 @@ router.patch("/show/review-update", userAuthenticate, showController.updateRevie
 router.put("/show/update", adminAuthenticate, showController.updateShow);
 router.delete("/show/like-delete/:show_id", userAuthenticate, showController.deleteLike);
 router.delete("/show/review-delete/:review_id/:show_id", userAuthenticate, showController.deleteReview);
+router.delete("/show/delete/user/reservation/:user_reservation_id/:show_times_id/:orderId", userAuthenticate, showController.deleteCancelShow);
 router.delete("/show/review/admin/delete/:review_id/:show_id", adminAuthenticate, showController.deleteAdminReview);
 router.delete("/show/delete/:show_id", adminAuthenticate, showController.deleteShow);
 

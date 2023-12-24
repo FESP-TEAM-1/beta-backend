@@ -530,17 +530,28 @@ exports.getUserReservation = async ({ user_id }) => {
   try {
     const result = await query(
       `
-      SELECT ur.*, sr.notice, s.show_type, s.title, s.location, s.location_detail, s.main_image_url, s.position, t.date_time 
-      FROM BETA_DATABASE.user_reservation AS ur
-      LEFT JOIN BETA_DATABASE.show_reservation_info AS sr
+      SELECT ur.*, u.user_name, u.user_email, u.phone_number, sr.notice, s.show_type, s.title, s.location, s.location_detail, s.main_image_url, s.position, t.date_time 
+      FROM user_reservation AS ur
+      LEFT JOIN user AS u
+      ON ur.user_id = u.id
+      LEFT JOIN show_reservation_info AS sr
       ON ur.show_id = sr.show_id
-      LEFT JOIN BETA_DATABASE.showing AS s
+      LEFT JOIN showing AS s
       ON ur.show_id = s.id
-      LEFT JOIN BETA_DATABASE.show_times AS t
+      LEFT JOIN show_times AS t
       ON ur.show_times_id = t.id
       WHERE ur.user_id = ?;`,
       [user_id]
     );
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
+exports.getUserReservationDetail = async ({ user_id, user_reservation_id }) => {
+  try {
+    const result = await query(`SELECT user_id, show_id FROM user_reservation WHERE user_id = ? AND id = ?`, [user_id, user_reservation_id]);
     return result;
   } catch (err) {
     throw err;
@@ -552,6 +563,19 @@ exports.deleteShowTimes = async ({ ...args }) => {
 
   try {
     const res = await query(`DELETE FROM show_times WHERE show_id = ? AND id = ?`, [show_id, show_times_id]);
+
+    return true;
+  } catch (err) {
+    throw err;
+  }
+};
+
+exports.deleteCancelShow = async ({ ...args }) => {
+  const { user_id, user_reservation_id, show_times_id } = args;
+
+  try {
+    const res = await query(`DELETE FROM user_reservation WHERE id = ?`, [user_reservation_id]);
+    const res2 = await query(`UPDATE show_times SET head_count = head_count + 1 WHERE id = ?`, [show_times_id]);
 
     return true;
   } catch (err) {

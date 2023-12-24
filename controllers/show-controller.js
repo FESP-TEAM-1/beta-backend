@@ -630,3 +630,28 @@ exports.getUserReservation = async (req, res) => {
     res.status(500).json({ ok: false, message: err.message });
   }
 };
+
+exports.deleteCancelShow = async (req, res) => {
+  try {
+    const { user_reservation_id, show_times_id, orderId } = req.params;
+    const user_login_id = req.login_id;
+
+    const userInfo = await userDB.getMember(user_login_id);
+    const user_id = userInfo[0].id;
+
+    const getUserReservationDetail = await showDB.getUserReservationDetail({ user_id, user_reservation_id });
+    if (getUserReservationDetail.length === 0) {
+      res.status(404).json({ ok: false, message: "예약 정보가 존재하지 않습니다." });
+      return;
+    }
+
+    const result = await showDB.deleteCancelShow({ user_id, user_reservation_id, show_times_id });
+
+    // 토스페이먼츠 결제 취소 로직
+
+    res.status(200).json({ ok: true, data: true });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ ok: false, message: err.message });
+  }
+};
