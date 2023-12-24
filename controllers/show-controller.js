@@ -2,6 +2,7 @@ const showDB = require("../models/show-db");
 const userDB = require("../models/user-db");
 const { uploadShowImg } = require("../middleware/imageUpload");
 const { deleteFileFromS3 } = require("../middleware/imageDelete");
+const { updateBannerImage } = require("./image-controller");
 
 const util = require("util");
 const db = require("../database/db"); // 데이터베이스 연결 설정
@@ -364,6 +365,7 @@ exports.updateShow = [
       if (req.files.mainImage) {
         main_image_url = `/${req.files.mainImage[0].key}`;
         if (showInfo[0].main_image_url) {
+          await updateBannerImage({ show_id: req.body.show_id, main_image_url });
           await deleteFileFromS3(showInfo[0].main_image_url.slice(1));
         }
       }
@@ -535,6 +537,7 @@ exports.deleteShow = async (req, res) => {
 
     // 공연, 전시 삭제
     await showDB.deleteShow({ show_id, user_id });
+    await ImageDB.deleteBannerImage({ show_id });
 
     res.status(200).json({ ok: true, data: "삭제 성공" });
   } catch (err) {

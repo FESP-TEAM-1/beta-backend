@@ -35,3 +35,21 @@ exports.getStoryImg = async (story_id) => {
     throw err;
   }
 };
+
+exports.updateBannerImage = async ({ show_id, banner_image_url }) => {
+  try {
+    const result = await query(`UPDATE banner_image SET image_url = ? WHERE show_id = ?`, [banner_image_url, show_id]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
+exports.deleteBannerImage = async ({ show_id }) => {
+  try {
+    const result = await query(`DELETE FROM banner_image WHERE show_id = ?`, [show_id]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
