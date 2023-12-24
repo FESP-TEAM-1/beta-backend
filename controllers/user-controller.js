@@ -303,37 +303,39 @@ exports.signup = async (req, res) => {
 };
 
 // 회원정보 수정
-exports.updateUser = async (req, res) => {
+exports.updateMember = async (req, res) => {
   try {
-    const { user_name, user_email, login_pw, birth_date, gender, phone_number } = req.body;
+    const { user_name, user_email, login_pw, birth_date, gender, phone_number, user_role } = req.body;
     const user_login_id = req.login_id;
-    const session_login_id = req.session.login_id;
-
-    if (session_login_id !== user_login_id) {
-      res.status(401).json({
-        ok: false,
-        message: "권한이 없습니다.",
-      });
-      return;
-    }
 
     // 유저 정보 조회 user_id 가져오기
     const userInfo = await userDB.getMember(user_login_id);
+    if (userInfo.length === 0) {
+      res.status(401).json({
+        ok: false,
+        message: "존재하지 않는 아이디입니다.",
+      });
+      return;
+    }
     const user_id = userInfo[0].id;
 
     const hash = await pwToHash(login_pw);
 
-    await userDB.updateUser({ user_id, user_name, user_email, hash, birth_date, gender, phone_number });
+    if (req.user_role === "admin") {
+      await userDB.updateAdmin({ user_id, user_name, hash, birth_date, gender, phone_number });
+    } else {
+      await userDB.updateUser({ user_id, user_name, user_email, hash, birth_date, gender, phone_number });
+    }
 
     res.status(200).json({
       ok: true,
-      data: "회원정보 수정 성공!!!",
+      data: "회원정보 수정 성공",
     });
   } catch (err) {
     console.error(err);
     res.status(500).json({
       ok: false,
-      message: "회원정보 수정 실패...",
+      message: "회원정보 수정 실패",
     });
     return;
   }

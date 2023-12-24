@@ -13,6 +13,6 @@ router.get("/refreshToken", userController.refreshToken);
 router.post("/signup", userController.signup);
 router.patch("/login", userController.login);
 router.patch("/logout", userController.logout);
-router.put("/updateUser", userAuthenticate, userController.updateUser);
+router.put("/updateMember", userAuthenticate, userController.updateMember);
 
 module.exports = router;
