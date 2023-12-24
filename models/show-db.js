@@ -511,7 +511,10 @@ exports.getAdminReservationManageDetail = async ({ show_id }) => {
     const result = await query(`select head_count from show_reservation_info where show_id = ?`, [show_id]);
 
     // user_reservation 가져오기
-    const result2 = await query(`select * from user_reservation where show_id = ?`, [show_id]);
+    const result2 = await query(
+      `select ur.*, u.login_id, u.user_name, u.phone_number, u.user_email from user_reservation as ur left join user as u on ur.user_id = u.id where show_id = ?`,
+      [show_id]
+    );
 
     // show_times 가져오기
     const result3 = await query(`select * from show_times where show_id = ?`, [show_id]);
