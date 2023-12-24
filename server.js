@@ -40,4 +40,5 @@ fs.readdirSync(routesPath).forEach((file) => {
 
 app.listen(5000, () => {
   console.log("서버 실행");
+  console.log("version 1.0.0");
 });
