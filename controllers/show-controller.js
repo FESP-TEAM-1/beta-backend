@@ -1,5 +1,6 @@
 const showDB = require("../models/show-db");
 const userDB = require("../models/user-db");
+const imageDB = require("../models/image-db");
 const { uploadShowImg } = require("../middleware/imageUpload");
 const { deleteFileFromS3 } = require("../middleware/imageDelete");
 const { updateBannerImage } = require("./image-controller");
@@ -537,7 +538,7 @@ exports.deleteShow = async (req, res) => {
 
     // 공연, 전시 삭제
     await showDB.deleteShow({ show_id, user_id });
-    await ImageDB.deleteBannerImage({ show_id });
+    await imageDB.deleteBannerImage({ show_id });
 
     res.status(200).json({ ok: true, data: "삭제 성공" });
   } catch (err) {
