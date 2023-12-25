@@ -319,7 +319,12 @@ exports.updateMember = async (req, res) => {
     }
     const user_id = userInfo[0].id;
 
-    const hash = await pwToHash(login_pw);
+    let hash = "";
+    if (login_pw === "") {
+      hash = userInfo[0].login_pw;
+    } else {
+      hash = await pwToHash(login_pw);
+    }
 
     if (req.user_role === "admin") {
       await userDB.updateAdmin({ user_id, user_name, hash, birth_date, gender, phone_number });
