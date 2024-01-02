@@ -10,9 +10,18 @@ const path = require("path");
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
+
+const allowedOrigins = [process.env.ENDPOINT_URL, process.env.ENDPOINT_URL2];
+
 app.use(
   cors({
-    origin: process.env.ENDPOINT_URL,
+    origin: (origin, callback) => {
+      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Origin not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
@@ -38,7 +47,10 @@ fs.readdirSync(routesPath).forEach((file) => {
   app.use("/api", route);
 });
 
-app.listen(5000, () => {
+app.listen(process.env.PORT, () => {
   console.log("서버 실행");
-  console.log("version 1.0.1");
+  console.log(process.env.PORT);
+  console.log(process.env.ENDPOINT_URL);
+  console.log(process.env.ENDPOINT_URL2);
+  console.log("version 1.0.4");
 });
