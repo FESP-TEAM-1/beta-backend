@@ -50,15 +50,6 @@ exports.getAllMember = async (req, res) => {
 exports.getMember = async (req, res) => {
   const user_login_id = req.login_id;
 
-  // 서버 재시작 시 세션 초기화 됨...
-  // if (user_login_id !== req.session.login_id) {
-  //   res.status(401).json({
-  //     ok: false,
-  //     message: "권한이 없습니다. 다시 로그인 해주시기 바랍니다.",
-  //   });
-  //   return;
-  // }
-
   try {
     const result = await userDB.getMember(user_login_id);
     res.status(200).json({
@@ -152,20 +143,17 @@ exports.login = async (req, res) => {
 
     // JWT 쿠키에 저장
     res.cookie("accessToken", accessToken, {
+      // domain: ".beta-beta.net",
       httpOnly: true,
       sameSite: "None",
       secure: true,
     });
     res.cookie("refreshToken", refreshToken, {
+      // domain: ".beta-beta.net",
       httpOnly: true,
       sameSite: "None",
       secure: true,
     });
-
-    // 세션 저장
-    req.session.login_id = user[0].login_id;
-    req.session.user_name = user[0].user_name;
-    req.session.user_role = user[0].user_role;
 
     await userDB.insertUserLog(user[0].user_role, user[0].login_id);
 
@@ -221,6 +209,7 @@ exports.refreshToken = async (req, res) => {
     const newAccessToken = jwt.generateAccessToken(userInfo);
 
     res.cookie("accessToken", newAccessToken, {
+      // domain: ".beta-beta.net",
       httpOnly: true,
       sameSite: "None",
       secure: true,
@@ -247,23 +236,11 @@ exports.refreshToken = async (req, res) => {
 
 // 로그아웃
 exports.logout = async (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      // 세션 파괴 중 에러 처리
-      return res.status(500).json({
-        ok: false,
-        message: "Logout failed",
-      });
-    }
-
-    // 세션 파괴 성공 후 쿠키 클리어 및 응답
-    res.clearCookie("connect.sid");
-    res.clearCookie("accessToken");
-    res.clearCookie("refreshToken");
-    res.status(200).json({
-      ok: true,
-      data: "Logout successful",
-    });
+  res.clearCookie("accessToken");
+  res.clearCookie("refreshToken");
+  res.status(200).json({
+    ok: true,
+    data: "Logout successful",
   });
 };
 
