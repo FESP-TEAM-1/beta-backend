@@ -143,13 +143,15 @@ exports.login = async (req, res) => {
 
     // JWT 쿠키에 저장
     res.cookie("accessToken", accessToken, {
-      // domain: ".beta-beta.net",
+      // domain: ".beta-beta.net",    // 배포 시 주석 해제
+      path: "/",
       httpOnly: true,
       sameSite: "None",
       secure: true,
     });
     res.cookie("refreshToken", refreshToken, {
-      // domain: ".beta-beta.net",
+      // domain: ".beta-beta.net",    // 배포 시 주석 해제
+      path: "/",
       httpOnly: true,
       sameSite: "None",
       secure: true,
@@ -209,7 +211,8 @@ exports.refreshToken = async (req, res) => {
     const newAccessToken = jwt.generateAccessToken(userInfo);
 
     res.cookie("accessToken", newAccessToken, {
-      // domain: ".beta-beta.net",
+      // domain: ".beta-beta.net",    // 배포 시 주석 해제
+      path: "/",
       httpOnly: true,
       sameSite: "None",
       secure: true,
@@ -236,8 +239,23 @@ exports.refreshToken = async (req, res) => {
 
 // 로그아웃
 exports.logout = async (req, res) => {
-  res.clearCookie("accessToken");
-  res.clearCookie("refreshToken");
+  // accessToken 삭제
+  res.clearCookie("accessToken", {
+    // domain: ".beta-beta.net",    // 배포 시 주석 해제
+    path: "/",
+    httpOnly: true,
+    sameSite: "None",
+    secure: true,
+  });
+
+  // refreshToken 삭제
+  res.clearCookie("refreshToken", {
+    // domain: ".beta-beta.net",    // 배포 시 주석 해제
+    path: "/",
+    httpOnly: true,
+    sameSite: "None",
+    secure: true,
+  });
   res.status(200).json({
     ok: true,
     data: "Logout successful",
