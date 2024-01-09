@@ -564,14 +564,14 @@ exports.getUserLike = async (req, res) => {
   }
 };
 
-exports.getAllShowUser = async (req, res) => {
+exports.getAllShowAdmin = async (req, res) => {
   try {
     const user_login_id = req.login_id;
 
     const userInfo = await userDB.getMember(user_login_id);
     const user_id = userInfo[0].id;
 
-    const result = await showDB.getAllShowUser({ user_id });
+    const result = await showDB.getAllShowAdmin({ user_id });
 
     res.status(200).json({ ok: true, data: result });
   } catch (err) {

@@ -90,7 +90,7 @@ exports.getShowWithUser = async ({ show_id, user_id }) => {
 };
 
 // user_id에 따른 show 조회
-exports.getAllShowUser = async ({ user_id }) => {
+exports.getAllShowAdmin = async ({ user_id }) => {
   try {
     const result = await query(
       `SELECT 
@@ -525,7 +525,7 @@ exports.getAdminReservationManageDetail = async ({ show_id }) => {
   }
 };
 
-// user_id에 따른 user_reservation 조회
+// 유저 마이페이지 user_id에 따른 user_reservation 조회
 exports.getUserReservation = async ({ user_id }) => {
   try {
     const result = await query(
