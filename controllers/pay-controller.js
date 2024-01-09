@@ -35,8 +35,8 @@ exports.confirm = async (req, res) => {
       return;
     }
 
-    const getUserReservation = await payDB.getUserReservation({ show_id, user_id });
-    if (getUserReservation.length > 0) {
+    const getPayUserReservation = await payDB.getPayUserReservation({ show_id, user_id });
+    if (getPayUserReservation.length > 0) {
       res.status(400).json({
         ok: false,
         message: "이미 예약 되었습니다.",
