@@ -354,7 +354,7 @@ exports.updateShow = [
       // 기존 공연, 전시 정보 조회
       const showInfo = await showDB.getShowWithUser({ show_id: req.body.show_id, user_id });
       if (showInfo.length === 0) {
-        res.status(404).json({ ok: false, message: "공연, 전시 정보가 존재하지 않습니다." });
+        res.status(400).json({ ok: false, message: "공연, 전시 정보가 존재하지 않습니다." });
         return;
       }
 
@@ -520,7 +520,7 @@ exports.deleteShow = async (req, res) => {
     // 기존 공연, 전시 정보 조회
     const showInfo = await showDB.getShowWithUser({ show_id: show_id, user_id });
     if (showInfo.length === 0) {
-      res.status(404).json({ ok: false, message: "공연, 전시 정보가 존재하지 않습니다." });
+      res.status(400).json({ ok: false, message: "공연, 전시 정보가 존재하지 않습니다." });
       return;
     }
 
@@ -645,7 +645,7 @@ exports.deleteCancelShow = async (req, res) => {
 
     const getUserReservationDetail = await showDB.getUserReservationDetail({ user_id, user_reservation_id });
     if (getUserReservationDetail.length === 0) {
-      res.status(404).json({ ok: false, message: "예약 정보가 존재하지 않습니다." });
+      res.status(400).json({ ok: false, message: "예약 정보가 존재하지 않습니다." });
       return;
     }
 

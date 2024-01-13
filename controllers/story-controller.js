@@ -108,7 +108,7 @@ exports.putStoryUpdate = [
       // 기존 스토리 정보 조회
       const storyInfo = await storyDB.getStory({ story_id, user_id });
       if (storyInfo.length === 0) {
-        res.status(404).json({
+        res.status(400).json({
           ok: false,
           message: "수정할 스토리를 찾을 수 없습니다.",
         });
@@ -168,7 +168,7 @@ exports.deleteStoryDelete = async (req, res) => {
 
     const storyInfo = await storyDB.getStory({ story_id, user_id });
     if (storyInfo.length === 0) {
-      res.status(404).json({
+      res.status(400).json({
         ok: false,
         message: "삭제할 스토리를 찾을 수 없습니다.",
       });
