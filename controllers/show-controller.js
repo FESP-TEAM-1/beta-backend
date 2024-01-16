@@ -4,6 +4,7 @@ const imageDB = require("../models/image-db");
 const { uploadShowImg } = require("../middleware/imageUpload");
 const { deleteFileFromS3 } = require("../middleware/imageDelete");
 const { updateBannerImage } = require("./image-controller");
+const { authenticateToken } = require("../middleware/auth-middleware");
 
 const util = require("util");
 const db = require("../database/db"); // 데이터베이스 연결 설정
@@ -65,22 +66,24 @@ exports.getFilterExhibitions = async (req, res) => {
 exports.getShow = async (req, res) => {
   try {
     const { show_id } = req.params;
-    const accessToken = req.cookies.accessToken;
     let result;
-    if (!accessToken) {
-      result = await showDB.getShow({ show_id });
-      if (result.length > 0 && result[0].content !== null) {
-        const bufferToString = Buffer.from(result[0].content, "base64").toString("utf8");
-        result[0].content = bufferToString;
-      }
-    } else {
-      const decoded = jwt.verifyToken(accessToken);
-      const user_login_id = decoded.login_id;
+
+    // 로그인을 했을 경우
+    if (await authenticateToken(req, res)) {
+      const user_login_id = req.login_id;
 
       const userInfo = await userDB.getMember(user_login_id);
       const user_id = userInfo[0].id;
 
       result = await showDB.getShowUser({ show_id, user_id });
+      if (result.length > 0 && result[0].content !== null) {
+        const bufferToString = Buffer.from(result[0].content, "base64").toString("utf8");
+        result[0].content = bufferToString;
+      }
+    }
+    // 로그인을 하지 않았거나 refreshToken이 만료 됐을 경우
+    else {
+      result = await showDB.getShow({ show_id });
       if (result.length > 0 && result[0].content !== null) {
         const bufferToString = Buffer.from(result[0].content, "base64").toString("utf8");
         result[0].content = bufferToString;
