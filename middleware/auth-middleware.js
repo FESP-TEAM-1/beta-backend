@@ -49,7 +49,7 @@ const userAuthenticate = async (req, res, next) => {
   if (await authenticateToken(req, res)) {
     next();
   } else {
-    res.status(401).json({ ok: false, message: "로그인 후 이용해주세요." });
+    res.status(401).json({ ok: false, message: "로그인 후 이용해주세요.", errorCode: "NOT_LOGGED_IN" });
   }
 };
 
@@ -62,4 +62,4 @@ const supervisorAuthenticate = async (req, res, next) => {
   }
 };
 
-module.exports = { adminAuthenticate, userAuthenticate, supervisorAuthenticate };
+module.exports = { adminAuthenticate, userAuthenticate, supervisorAuthenticate, authenticateToken };
