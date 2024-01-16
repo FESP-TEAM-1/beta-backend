@@ -28,5 +28,5 @@ app.listen(process.env.PORT, () => {
   console.log("서버 실행");
   console.log(process.env.PORT);
   console.log(process.env.ENDPOINT_URL);
-  console.log("version 1.1.1");
+  console.log("version 1.1.2");
 });
