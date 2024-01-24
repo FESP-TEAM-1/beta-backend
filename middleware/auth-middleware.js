@@ -40,7 +40,7 @@ const adminAuthenticate = async (req, res, next) => {
   if (await authenticateToken(req, res, "admin")) {
     next();
   } else {
-    res.status(401).json({ ok: false, message: "관리자로 로그인 해주시기 바랍니다." });
+    res.status(401).json({ ok: false, message: "관리자로 로그인 해주시기 바랍니다.", errorCode: "NOT_LOGGED_IN" });
   }
 };
 
