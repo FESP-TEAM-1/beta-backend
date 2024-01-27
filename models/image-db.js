@@ -43,9 +43,13 @@ exports.getStoryImg = async (story_id) => {
   }
 };
 
-exports.updateBannerImage = async ({ show_id, banner_image_url }) => {
+exports.updateBannerImage = async ({ show_id, banner_image_url, banner_image_color }) => {
   try {
-    const result = await query(`UPDATE banner_image SET image_url = ? WHERE show_id = ?`, [banner_image_url, show_id]);
+    const result = await query(`UPDATE banner_image SET image_url = ?, image_color = ? WHERE show_id = ?`, [
+      banner_image_url,
+      banner_image_color,
+      show_id,
+    ]);
     return result;
   } catch (err) {
     throw err;

@@ -3,7 +3,6 @@ const userDB = require("../models/user-db");
 const imageDB = require("../models/image-db");
 const { uploadShowImg } = require("../middleware/imageUpload");
 const { deleteFileFromS3 } = require("../middleware/imageDelete");
-const { updateBannerImage } = require("./image-controller");
 const { authenticateToken } = require("../middleware/auth-middleware");
 
 const util = require("util");
@@ -369,7 +368,11 @@ exports.updateShow = [
       if (req.files.mainImage) {
         main_image_url = `/${req.files.mainImage[0].key}`;
         if (showInfo[0].main_image_url) {
-          await updateBannerImage({ show_id: req.body.show_id, main_image_url });
+          await imageDB.updateBannerImage({
+            show_id: req.body.show_id,
+            banner_image_url: main_image_url,
+            banner_image_color: req.body.main_image_color,
+          });
           await deleteFileFromS3(showInfo[0].main_image_url.slice(1));
         }
       }
