@@ -17,7 +17,7 @@ const authenticateToken = async (req, res, expectedRole) => {
       };
       const newAccessToken = jwt.generateAccessToken(userInfo);
       res.cookie("accessToken", newAccessToken, {
-        // domain: ".beta-beta.net", // 배포 시 주석 해제
+        domain: process.env.COOKIE_DOMAIN || undefined,
         path: "/",
         httpOnly: true,
         sameSite: "None",

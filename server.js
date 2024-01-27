@@ -1,4 +1,4 @@
-require("dotenv").config();
+require("dotenv").config({ path: __dirname + "/.env.development" }); // 배포 시 .env.production 으로 변경
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");

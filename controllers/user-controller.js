@@ -143,14 +143,14 @@ exports.login = async (req, res) => {
 
     // JWT 쿠키에 저장
     res.cookie("accessToken", accessToken, {
-      // domain: ".beta-beta.net",    // 배포 시 주석 해제
+      domain: process.env.COOKIE_DOMAIN || undefined,
       path: "/",
       httpOnly: true,
       sameSite: "None",
       secure: true,
     });
     res.cookie("refreshToken", refreshToken, {
-      // domain: ".beta-beta.net",    // 배포 시 주석 해제
+      domain: process.env.COOKIE_DOMAIN || undefined,
       path: "/",
       httpOnly: true,
       sameSite: "None",
@@ -211,7 +211,7 @@ exports.refreshToken = async (req, res) => {
     const newAccessToken = jwt.generateAccessToken(userInfo);
 
     res.cookie("accessToken", newAccessToken, {
-      // domain: ".beta-beta.net",    // 배포 시 주석 해제
+      domain: process.env.COOKIE_DOMAIN || undefined,
       path: "/",
       httpOnly: true,
       sameSite: "None",
@@ -241,7 +241,7 @@ exports.refreshToken = async (req, res) => {
 exports.logout = async (req, res) => {
   // accessToken 삭제
   res.clearCookie("accessToken", {
-    // domain: ".beta-beta.net",    // 배포 시 주석 해제
+    domain: process.env.COOKIE_DOMAIN || undefined,
     path: "/",
     httpOnly: true,
     sameSite: "None",
@@ -250,7 +250,7 @@ exports.logout = async (req, res) => {
 
   // refreshToken 삭제
   res.clearCookie("refreshToken", {
-    // domain: ".beta-beta.net",    // 배포 시 주석 해제
+    domain: process.env.COOKIE_DOMAIN || undefined,
     path: "/",
     httpOnly: true,
     sameSite: "None",
