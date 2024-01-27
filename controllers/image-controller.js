@@ -56,21 +56,3 @@ exports.getStoryImg = async (req, res) => {
     return;
   }
 };
-
-exports.updateBannerImage = async (req, res) => {
-  try {
-    const { show_id, banner_img_url } = req.body;
-    const result = await imageDB.updateBannerImage(show_id, banner_img_url);
-    res.status(200).json({
-      ok: true,
-      data: true,
-    });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({
-      ok: false,
-      messge: err,
-    });
-    return;
-  }
-};
