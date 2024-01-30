@@ -31,6 +31,16 @@ exports.getFilterExhibitions = async ({ location, start_date, end_date, progress
   }
 };
 
+// show_id에 따른 날짜 조회
+exports.getShowDate = async ({ show_id }) => {
+  try {
+    const result = await query(`SELECT show_type, start_date, end_date FROM showing WHERE id = ?`, [show_id]);
+    return result;
+  } catch (err) {
+    throw err;
+  }
+};
+
 // show_id에 따른 공연 조회
 exports.getShow = async ({ show_id }) => {
   try {
@@ -132,7 +142,7 @@ exports.getShowReview = async ({ show_id }) => {
 exports.getShowReservation = async ({ show_id }) => {
   try {
     const result = await query(
-      `SELECT a.*, b.title AS title, b.location_detail AS location_detail FROM show_reservation_info AS a LEFT JOIN showing AS b ON a.show_id = b.id WHERE show_id = ?;`,
+      `SELECT a.*, b.show_type AS show_type, b.end_date AS end_date, b.title AS title, b.location_detail AS location_detail FROM show_reservation_info AS a LEFT JOIN showing AS b ON a.show_id = b.id WHERE show_id = ?;`,
       [show_id]
     );
     return result;
@@ -551,7 +561,10 @@ exports.getUserReservation = async ({ user_id }) => {
 
 exports.getUserReservationDetail = async ({ user_id, user_reservation_id }) => {
   try {
-    const result = await query(`SELECT user_id, show_id FROM user_reservation WHERE user_id = ? AND id = ?`, [user_id, user_reservation_id]);
+    const result = await query(`SELECT user_id, show_id, paymentKey FROM user_reservation WHERE user_id = ? AND id = ?`, [
+      user_id,
+      user_reservation_id,
+    ]);
     return result;
   } catch (err) {
     throw err;
