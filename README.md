@@ -10,7 +10,7 @@
   $ npm run dev
   ```
 
-- .env
+- .env.development / .env.production
   ```
   PORT=
   ENDPOINT_URL=
@@ -22,6 +22,7 @@
   DB_SCHEMA=
   
   JWT_SECRET_KEY=
+  COOKIE_DOMAIN
   
   AWS_ACCESS_KEY_ID=
   AWS_SECRET_ACCESS_KEY=
