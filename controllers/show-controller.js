@@ -4,6 +4,7 @@ const imageDB = require("../models/image-db");
 const { uploadShowImg } = require("../middleware/imageUpload");
 const { deleteFileFromS3 } = require("../middleware/imageDelete");
 const { authenticateToken } = require("../middleware/auth-middleware");
+const { payCancelFunc } = require("./pay-controller");
 
 const util = require("util");
 const db = require("../database/db"); // 데이터베이스 연결 설정
@@ -121,7 +122,6 @@ exports.getShowReservation = async (req, res) => {
 
     const showTimes = await showDB.getShowTimes({ show_id });
     result[0].date_time = showTimes;
-
     res.status(200).json({ ok: true, data: result });
   } catch (err) {
     console.error(err);
@@ -646,22 +646,31 @@ exports.deleteCancelShow = async (req, res) => {
     const { user_reservation_id, show_times_id, orderId } = req.params;
     const user_login_id = req.login_id;
 
+    // 트랜잭션 시작
+    await beginTransaction();
+
     const userInfo = await userDB.getMember(user_login_id);
     const user_id = userInfo[0].id;
 
-    const getUserReservationDetail = await showDB.getUserReservationDetail({ user_id, user_reservation_id });
+    const getUserReservationDetail = await showDB.getUserReservationDetail({ user_id, user_reservation_id, orderId });
     if (getUserReservationDetail.length === 0) {
       res.status(400).json({ ok: false, message: "예약 정보가 존재하지 않습니다." });
       return;
     }
-
-    const result = await showDB.deleteCancelShow({ user_id, user_reservation_id, show_times_id });
+    const paymentKey = getUserReservationDetail[0].paymentKey;
 
     // 토스페이먼츠 결제 취소 로직
+    if (paymentKey) await payCancelFunc(paymentKey, "예매 취소");
+    // db 삭제
+    await showDB.deleteCancelShow({ user_id, user_reservation_id, show_times_id });
+
+    // 트랜잭션 커밋
+    await commit();
 
     res.status(200).json({ ok: true, data: true });
   } catch (err) {
     console.log(err);
+    await rollback(); // 오류 발생 시 트랜잭션 롤백
     res.status(500).json({ ok: false, message: err.message });
   }
 };
