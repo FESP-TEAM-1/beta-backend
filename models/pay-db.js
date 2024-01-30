@@ -6,13 +6,13 @@ const beginTransaction = util.promisify(db.beginTransaction).bind(db); // 트랜
 const commit = util.promisify(db.commit).bind(db); // 트랜잭션 커밋
 const rollback = util.promisify(db.rollback).bind(db); // 트랜잭션 롤백 (시작 지점으로)
 
-exports.insertUserReservation = async ({ show_id, show_times_id, user_id, is_receive_email, orderId = null, amount = null }) => {
+exports.insertUserReservation = async ({ show_id, show_times_id, user_id, is_receive_email, orderId = null, price = null, paymentKey = null }) => {
   try {
     let queryValue = "";
     let queryParams = [];
     if (orderId) {
-      queryValue = "(orderId, amount, show_id, show_times_id, user_id, is_receive_email) VALUES (?, ?, ?, ?, ?, ?)";
-      queryParams = [orderId, amount, show_id, show_times_id, user_id, is_receive_email];
+      queryValue = "(orderId, amount, paymentKey, show_id, show_times_id, user_id, is_receive_email) VALUES (?, ?, ?, ?, ?, ?, ?)";
+      queryParams = [orderId, price, paymentKey, show_id, show_times_id, user_id, is_receive_email];
     } else {
       queryValue = "(show_id, show_times_id, user_id, is_receive_email) VALUES (?, ?, ?, ?)";
       queryParams = [show_id, show_times_id, user_id, is_receive_email];
@@ -37,9 +37,13 @@ exports.updateShowTimes = async ({ show_times_id }) => {
   }
 };
 
-exports.getPayUserReservation = async ({ show_id, user_id }) => {
+exports.getPayUserReservation = async ({ show_id, user_id, show_times_id }) => {
   try {
-    const result = await query(`SELECT * FROM user_reservation WHERE show_id = ? AND user_id = ?`, [show_id, user_id]);
+    const result = await query(`SELECT * FROM user_reservation WHERE show_id = ? AND user_id = ? AND show_times_id = ?`, [
+      show_id,
+      user_id,
+      show_times_id,
+    ]);
     return result;
   } catch (err) {
     console.error(err);
