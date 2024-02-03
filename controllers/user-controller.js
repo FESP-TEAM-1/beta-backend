@@ -300,8 +300,16 @@ exports.signup = async (req, res) => {
 // 회원정보 수정
 exports.updateMember = async (req, res) => {
   try {
-    const { user_name, user_email, login_pw, birth_date, gender, phone_number, user_role } = req.body;
+    const { user_name, user_email, login_pw, birth_date, gender, phone_number } = req.body;
     const user_login_id = req.login_id;
+
+    if (user_login_id === "user" || user_login_id === "admin") {
+      res.status(401).json({
+        ok: false,
+        message: "해당 아이디는 수정할 수 없습니다.",
+      });
+      return;
+    }
 
     // 유저 정보 조회 user_id 가져오기
     const userInfo = await userDB.getMember(user_login_id);
