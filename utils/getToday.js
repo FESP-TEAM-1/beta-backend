@@ -1,10 +1,8 @@
-const getToday = () => {
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, "0"); // 두 자리로 맞춤
-  const day = String(today.getDate()).padStart(2, "0"); // 두 자리로 맞춤
+const getKoreaTime = require("./getKoreaTime");
 
-  return `${year}-${month}-${day}`;
+const getToday = () => {
+  const today = getKoreaTime();
+  return today.split("T")[0];
 };
 
 module.exports = getToday;
