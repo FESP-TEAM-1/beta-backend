@@ -1,4 +1,4 @@
-require("dotenv").config({ path: __dirname + "/.env.development" }); // 배포 시 .env.production 으로 변경
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
@@ -25,8 +25,5 @@ fs.readdirSync(routesPath).forEach((file) => {
 });
 
 app.listen(process.env.PORT, () => {
-  console.log("서버 실행");
-  console.log(process.env.PORT);
-  console.log(process.env.ENDPOINT_URL);
   console.log("version 1.1.6");
 });
