@@ -1,8 +1,5 @@
-const getToday = require("./getToday"); // 오늘 날짜를 가져오는 함수
-
 const filterShow = (type, ...arg) => {
   const { location, start_date, end_date, progress, category } = arg[0];
-  const today = getToday(); // 오늘 날짜
 
   let queryValue = "SELECT * FROM showing WHERE show_type = ?";
   let queryParams = [type];
